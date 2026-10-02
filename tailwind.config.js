@@ -51,6 +51,14 @@ module.exports = {
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
   			},
+  			navy: {
+  				DEFAULT: 'hsl(var(--navy))',
+  				deep: 'hsl(var(--navy-deep))'
+  			},
+  			gold: {
+  				DEFAULT: 'hsl(var(--gold))',
+  				soft: 'hsl(var(--gold-soft))'
+  			},
   			sidebar: {
   				DEFAULT: 'hsl(var(--sidebar-background))',
   				foreground: 'hsl(var(--sidebar-foreground))',
