@@ -4,7 +4,7 @@ import { Image } from '@/components/ui/image';
 import { formatPrice } from '@/data/site';
 
 const TRANSACTION_LABEL = { location: 'À louer', vente: 'À vendre', evenement: 'Événementiel' };
-const STATUS_LABEL = { loue: 'Loué', vendu: 'Vendu' };
+const STATUS_LABEL = { prise: 'Déjà prise', vendu: 'Vendu' };
 
 export default function PropertyCard({ property }) {
   const unavailable = property.status !== 'disponible';

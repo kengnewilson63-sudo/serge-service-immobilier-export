@@ -23,7 +23,7 @@ import { PROPERTIES, getPropertyById } from '@/data/properties';
 import { CONTACT, formatPrice, telLink, waLink } from '@/data/site';
 
 const TRANSACTION_LABEL = { location: 'À louer', vente: 'À vendre', evenement: 'Événementiel' };
-const STATUS_LABEL = { disponible: 'Disponible', loue: 'Loué', vendu: 'Vendu' };
+const STATUS_LABEL = { disponible: 'Disponible', prise: 'Déjà prise', vendu: 'Vendu' };
 
 export default function PropertyDetail() {
   const { id } = useParams();

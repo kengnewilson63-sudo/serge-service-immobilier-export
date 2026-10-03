@@ -39,46 +39,56 @@ export const NAV_LINKS = [
   { label: 'Contact', to: '/contact' },
 ];
 
+const img = (id) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1200&q=80`;
+
 export const SERVICES = [
   {
     icon: 'Building2',
     title: "Location d'appartements",
     desc: "Des appartements vérifiés à Douala, du studio au duplex, avec visite organisée et accompagnement jusqu'à la remise des clés.",
+    image: img('1522708323590-d24dbb6b0267'),
   },
   {
     icon: 'Store',
     title: 'Chambres meublées & studios',
     desc: 'Solutions rapides et confortables pour étudiants, travailleurs et séjours de courte ou moyenne durée.',
+    image: img('1502672260266-1c1ef2d93688'),
   },
   {
     icon: 'Home',
     title: 'Vente de maisons et villas',
     desc: 'Sélection de maisons et villas pour habitation ou investissement, présentées avec toutes les informations utiles.',
+    image: img('1613490493576-7fde63acd811'),
   },
   {
     icon: 'Trees',
     title: 'Vente de terrains',
     desc: 'Terrains situés dans les zones en développement de Douala, avec accompagnement dans vos démarches.',
+    image: img('1500382017468-9049fed747ef'),
   },
   {
     icon: 'Key',
     title: 'Gestion immobilière',
     desc: "Confiez-nous votre bien : mise en location, suivi des occupants, entretien et reporting transparent.",
+    image: img('1560518883-ce09059eeffa'),
   },
   {
     icon: 'UserCheck',
     title: 'Accompagnement personnalisé',
     desc: "Un interlocuteur dédié vous guide de la recherche du logement jusqu'à la signature et l'installation.",
+    image: img('1521737711867-e3b97375f902'),
   },
   {
     icon: 'PartyPopper',
     title: 'Location événementielle',
     desc: "Salles des fêtes et espaces aménagés pour vos cérémonies, séminaires et événements privés.",
+    image: img('1519167758481-83f550bb49b3'),
   },
   {
     icon: 'Briefcase',
     title: 'Locaux commerciaux & bureaux',
     desc: 'Espaces professionnels adaptés aux commerces, cliniques, crèches, restaurants et centres de formation.',
+    image: img('1497366754035-f200968a6e72'),
   },
 ];
 
@@ -109,4 +119,10 @@ export const TRANSACTIONS = [
   { value: 'location', label: 'À louer' },
   { value: 'vente', label: 'À vendre' },
   { value: 'evenement', label: 'Événementiel' },
+];
+
+export const STATUSES = [
+  { value: 'disponible', label: 'Disponible' },
+  { value: 'prise', label: 'Déjà prise' },
+  { value: 'vendu', label: 'Vendu' },
 ];

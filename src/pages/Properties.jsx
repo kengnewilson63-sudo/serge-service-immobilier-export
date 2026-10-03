@@ -4,6 +4,7 @@ import { SearchX } from 'lucide-react';
 import PageHero from '@/components/PageHero';
 import PropertyCard from '@/components/PropertyCard';
 import PropertyFilters from '@/components/PropertyFilters';
+import TypeChips from '@/components/TypeChips';
 import Reveal from '@/components/Reveal';
 import { Button } from '@/components/ui/button';
 import { PROPERTIES } from '@/data/properties';
@@ -91,6 +92,9 @@ export default function Properties() {
 
       <section className="bg-secondary/40 py-12 sm:py-16">
         <div className="container-x">
+          <div className="mb-6">
+            <TypeChips value={filters.type} onChange={(v) => update('type', v)} />
+          </div>
           <PropertyFilters filters={filters} onChange={update} onReset={reset} options={options} />
 
           <div className="mt-10 flex items-baseline justify-between">

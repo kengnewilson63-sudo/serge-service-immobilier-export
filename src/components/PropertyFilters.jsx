@@ -1,7 +1,7 @@
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { TRANSACTIONS } from '@/data/site';
+import { TRANSACTIONS, STATUSES } from '@/data/site';
 
 const Select = ({ label, value, onChange, options, placeholder }) => (
   <label className="flex flex-col gap-1.5">
@@ -128,11 +128,7 @@ export default function PropertyFilters({ filters, onChange, onReset, options })
           label="Statut"
           value={filters.status}
           onChange={(v) => onChange('statut', v)}
-          options={[
-            { value: 'disponible', label: 'Disponible' },
-            { value: 'loue', label: 'Loué' },
-            { value: 'vendu', label: 'Vendu' },
-          ]}
+          options={STATUSES}
           placeholder="Tous les statuts"
         />
       </div>

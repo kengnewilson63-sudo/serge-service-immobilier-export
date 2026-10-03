@@ -1,15 +1,26 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, MapPin } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Reveal from '@/components/Reveal';
 import SectionHeading from '@/components/SectionHeading';
+import { Image } from '@/components/ui/image';
 import { PROPERTIES } from '@/data/properties';
 
 export default function Neighborhoods() {
-  const counts = PROPERTIES.reduce((acc, p) => {
+  const available = PROPERTIES.filter((p) => p.status === 'disponible');
+
+  const counts = available.reduce((acc, p) => {
     acc[p.neighborhood] = (acc[p.neighborhood] || 0) + 1;
     return acc;
   }, {});
-  const list = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 6);
+
+  const list = Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6)
+    .map(([name, count]) => ({
+      name,
+      count,
+      image: available.find((p) => p.neighborhood === name).images[0],
+    }));
 
   return (
     <section className="py-20 sm:py-24">
@@ -21,25 +32,31 @@ export default function Neighborhoods() {
           align="center"
         />
 
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {list.map(([name, count], i) => (
-            <Reveal key={name} delay={i * 0.06}>
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {list.map((n, i) => (
+            <Reveal key={n.name} delay={i * 0.06}>
               <Link
-                to={`/biens?quartier=${encodeURIComponent(name)}`}
-                className="group flex items-center justify-between rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg"
+                to={`/biens?quartier=${encodeURIComponent(n.name)}`}
+                className="group relative block overflow-hidden rounded-2xl border border-border shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
               >
-                <span className="flex items-center gap-3">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/8 text-primary">
-                    <MapPin className="h-5 w-5" />
+                <Image
+                  src={n.image}
+                  alt={`Biens immobiliers à ${n.name}, Douala`}
+                  className="aspect-[4/3] w-full transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/45 to-transparent" />
+
+                <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-5">
+                  <div>
+                    <p className="font-heading text-lg font-bold text-white">{n.name}</p>
+                    <p className="text-xs font-medium text-white/75">
+                      {n.count} bien{n.count > 1 ? 's' : ''} disponible{n.count > 1 ? 's' : ''}
+                    </p>
+                  </div>
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground transition-transform duration-300 group-hover:translate-x-1">
+                    <ArrowRight className="h-4 w-4" />
                   </span>
-                  <span>
-                    <span className="block font-heading text-base font-semibold text-navy">{name}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {count} bien{count > 1 ? 's' : ''} disponible{count > 1 ? 's' : ''}
-                    </span>
-                  </span>
-                </span>
-                <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
+                </div>
               </Link>
             </Reveal>
           ))}
