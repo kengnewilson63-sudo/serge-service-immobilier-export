@@ -46,7 +46,7 @@ export const SERVICES = [
     icon: 'Building2',
     title: "Location d'appartements",
     desc: "Des appartements vérifiés à Douala, du studio au duplex, avec visite organisée et accompagnement jusqu'à la remise des clés.",
-    image: img('1522708323590-d24dbb6b0267'),
+    image: 'https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/350ddceba_WhatsAppImage2026-10-02at1734262.jpeg',
   },
   {
     icon: 'Store',
