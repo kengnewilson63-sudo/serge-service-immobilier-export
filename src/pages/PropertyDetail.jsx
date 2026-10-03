@@ -14,6 +14,8 @@ import {
   Tag,
 } from 'lucide-react';
 import ContactButtons from '@/components/ContactButtons';
+import Seo from '@/components/Seo';
+import { listingJsonLd } from '@/lib/seo';
 import PropertyCard from '@/components/PropertyCard';
 import Reveal from '@/components/Reveal';
 import { Button } from '@/components/ui/button';
@@ -54,6 +56,12 @@ export default function PropertyDetail() {
 
   return (
     <>
+      <Seo
+        title={`${property.title} — ${property.priceLabel} | Serge Service Immobilier`}
+        description={`${property.type} ${property.transaction === 'vente' ? 'à vendre' : property.transaction === 'location' ? 'à louer' : 'à louer'} à ${property.neighborhood}, ${property.city}.${property.rooms > 0 ? ` ${property.rooms} chambres,` : ''} ${property.area} m². ${property.terms}. Contact direct WhatsApp.`}
+        path={`/biens/${property.id}`}
+        jsonLd={listingJsonLd(property)}
+      />
       <section className="border-b border-border bg-secondary/40 py-5">
         <div className="container-x flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
           <Link to="/" className="transition-colors hover:text-primary">Accueil</Link>

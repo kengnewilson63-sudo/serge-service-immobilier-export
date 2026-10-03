@@ -3,6 +3,7 @@ import PageHero from '@/components/PageHero';
 import Reveal from '@/components/Reveal';
 import SectionHeading from '@/components/SectionHeading';
 import CtaBand from '@/components/home/CtaBand';
+import Seo from '@/components/Seo';
 import { Image } from '@/components/ui/image';
 import { CONTACT, SITE } from '@/data/site';
 import { PROPERTIES } from '@/data/properties';
@@ -21,6 +22,11 @@ export default function About() {
 
   return (
     <>
+      <Seo
+        title="À propos de Serge Service Immobilier — Agence immobilière à Douala"
+        description="Serge Service Immobilier (S.S.I) est une agence immobilière basée à Douala, spécialisée dans la location, la vente et la gestion de biens dans tout le Littoral."
+        path="/a-propos"
+      />
       <PageHero
         breadcrumb="À propos"
         eyebrow="Qui sommes-nous"

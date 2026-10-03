@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://serge-home-flow.base44.app/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/services</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/a-propos</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/contact</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+
+  <url><loc>https://serge-home-flow.base44.app/biens/makepe-3-chambres</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/logpom-gabon-bar-2-chambres</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/bonamoussadi-sable-3-chambres</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/logpom-maison-jumelle-2-chambres</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/kotto-baden-baden-2-chambres</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/logpom-duplex-5-chambres</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/logpom-appartement-neuf-2-chambres</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/logbessou-rdc-3-chambres</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/logbessou-2-chambres</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/logbessou-nickel-oil-2-chambres</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/kotto-mbangue-4-chambres</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/makepe-montana-studios</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/bonamoussadi-local-commercial</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/bonaberi-terrain-500</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/yassa-terrain-800</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/bonapriso-villa-5-chambres</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/akwa-local-commercial</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/bonamoussadi-salle-fetes</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/bonaberi-terrain-300</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/logbessou-terrain-600</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/kotto-terrain-450</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/yassa-terrain-1000</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/ndogpassi-terrain-700</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/logpom-studio-meuble</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/bonamoussadi-studio-neuf</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/makepe-studio-meuble</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/akwa-chambre-meublee</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/bonapriso-chambre-meublee</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/logbessou-chambre-meublee</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/yassa-villa-4-chambres</loc><priority>0.8</priority></url>
+  <url><loc>https://serge-home-flow.base44.app/biens/bonamoussadi-appartement-vente</loc><priority>0.8</priority></url>
+</urlset>

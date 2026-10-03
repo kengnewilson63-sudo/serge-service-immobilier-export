@@ -6,6 +6,7 @@ import Reveal from '@/components/Reveal';
 import SectionHeading from '@/components/SectionHeading';
 import CtaBand from '@/components/home/CtaBand';
 import { Button } from '@/components/ui/button';
+import Seo from '@/components/Seo';
 
 const STEPS = [
   { icon: Search, title: '1. Vous recherchez', desc: 'Parcourez le catalogue et filtrez selon votre budget, votre quartier et vos besoins.' },
@@ -17,6 +18,11 @@ const STEPS = [
 export default function Services() {
   return (
     <>
+      <Seo
+        title="Nos services immobiliers à Douala | Serge Service Immobilier"
+        description="Location d'appartements, studios et chambres meublées, vente de maisons, villas et terrains, gestion immobilière, locaux commerciaux et location événementielle à Douala."
+        path="/services"
+      />
       <PageHero
         breadcrumb="Services"
         eyebrow="Nos prestations"

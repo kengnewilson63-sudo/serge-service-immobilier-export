@@ -9,10 +9,16 @@ import ServicesGrid from '@/components/ServicesGrid';
 import Reveal from '@/components/Reveal';
 import SectionHeading from '@/components/SectionHeading';
 import { Button } from '@/components/ui/button';
+import Seo from '@/components/Seo';
 
 export default function Home() {
   return (
     <>
+      <Seo
+        title="Serge Service Immobilier — Location & vente immobilière à Douala"
+        description="Appartements, studios et chambres meublées à louer, maisons, villas et terrains à vendre à Douala. Serge Service Immobilier vous accompagne de la recherche à la remise des clés."
+        path="/"
+      />
       <Hero />
       <TrustBand />
       <FeaturedProperties />

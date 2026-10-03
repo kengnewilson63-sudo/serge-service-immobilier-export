@@ -6,6 +6,7 @@ import SectionHeading from '@/components/SectionHeading';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import Seo from '@/components/Seo';
 import { CONTACT, PRIMARY, SECONDARY, telLink, waLink } from '@/data/site';
 
 const inputClass = 'h-12 border-input focus:border-primary focus:ring-2 focus:ring-primary/15';
@@ -36,6 +37,11 @@ export default function Contact() {
 
   return (
     <>
+      <Seo
+        title="Contact — Serge Service Immobilier à Douala | 681 28 45 14"
+        description="Contactez Serge Service Immobilier à Douala pour une location, une vente ou une visite. Deux agences à Douala : Cité des Palmiers et Logpom Bassong. WhatsApp 681 28 45 14."
+        path="/contact"
+      />
       <PageHero
         breadcrumb="Contact"
         eyebrow="Parlons de votre projet"

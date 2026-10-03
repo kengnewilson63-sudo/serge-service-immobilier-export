@@ -1,0 +1,18 @@
+{
+  "name": "Serge Service Immobilier",
+  "short_name": "S.S.I",
+  "description": "Location et vente de biens immobiliers à Douala : appartements, studios, chambres meublées, maisons, villas et terrains.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0056B3",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/cb1abc266_WhatsAppImage2026-10-02at171404.jpeg",
+      "sizes": "any",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { SearchX } from 'lucide-react';
 import PageHero from '@/components/PageHero';
@@ -7,6 +7,8 @@ import PropertyFilters from '@/components/PropertyFilters';
 import TypeChips from '@/components/TypeChips';
 import Reveal from '@/components/Reveal';
 import { Button } from '@/components/ui/button';
+import Seo from '@/components/Seo';
+import { LISTINGS_JSON_LD } from '@/lib/seo';
 import { PROPERTIES } from '@/data/properties';
 
 const unique = (key) => [...new Set(PROPERTIES.map((p) => p[key]))].sort();
@@ -49,6 +51,15 @@ export default function Properties() {
 
   const reset = () => setSearchParams(new URLSearchParams(), { replace: true });
 
+  const resultsRef = useRef(null);
+
+  const selectType = (value) => {
+    update('type', value);
+    requestAnimationFrame(() => {
+      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  };
+
   const options = useMemo(
     () => ({
       types: unique('type'),
@@ -83,6 +94,12 @@ export default function Properties() {
 
   return (
     <>
+      <Seo
+        title="Biens immobiliers à louer et à vendre à Douala | Serge Service Immobilier"
+        description="Découvrez nos appartements, studios, chambres meublées, duplex, maisons, villas, terrains et locaux commerciaux à Douala. Filtrez par quartier, budget et type de bien."
+        path="/biens"
+        jsonLd={LISTINGS_JSON_LD}
+      />
       <PageHero
         breadcrumb="Biens immobiliers"
         eyebrow="Notre catalogue"
@@ -93,11 +110,11 @@ export default function Properties() {
       <section className="bg-secondary/40 py-12 sm:py-16">
         <div className="container-x">
           <div className="mb-6">
-            <TypeChips value={filters.type} onChange={(v) => update('type', v)} />
+            <TypeChips value={filters.type} onChange={selectType} />
           </div>
           <PropertyFilters filters={filters} onChange={update} onReset={reset} options={options} />
 
-          <div className="mt-10 flex items-baseline justify-between">
+          <div ref={resultsRef} className="mt-10 scroll-mt-28">
             <p className="text-sm text-muted-foreground">
               <span className="font-heading text-lg font-bold text-navy">{results.length}</span>{' '}
               bien{results.length > 1 ? 's' : ''} correspondant à votre recherche
