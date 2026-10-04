@@ -1,10 +1,23 @@
-const u = (id) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1400&q=80`;
+const m = (id) => `https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/${id}_generated_image.png`;
 
 /**
  * MAQUETTE — Données de démonstration.
- * Les visuels sont des photos d'illustration (placeholders), à remplacer par
- * les photos réelles de l'agence. Les informations proviennent des annonces fournies.
+ * Visuels générés en ambiance camerounaise (Douala), à remplacer par les photos
+ * réelles de l'agence. Les informations proviennent des annonces fournies.
  */
+const PHOTO = {
+  appartA: m('36f830151'),
+  appartB: m('b60e5b74b'),
+  appartC: m('42bcd68b7'),
+  studio: m('748c05530'),
+  chambre: m('721633228'),
+  villaA: m('0a79d811d'),
+  villaB: m('6cfb56328'),
+  terrainA: m('2f0b4f113'),
+  terrainB: m('14ee41815'),
+  local: m('f1af9e1e7'),
+  salle: m('fe754179d'),
+};
 export const PROPERTIES = [
   {
     id: 'makepe-3-chambres',
@@ -37,7 +50,7 @@ export const PROPERTIES = [
       'Gardien',
       'Très vaste parking',
     ],
-    images: [u('1600607687939-ce8a6c25118c'), u('1600566753086-00f18fb6b3ea'), u('1484154218962-a197022b5858'), u('1493809842364-78817add7ffb')],
+    images: [PHOTO.appartA, PHOTO.appartB, PHOTO.appartC, PHOTO.appartA],
   },
   {
     id: 'logpom-gabon-bar-2-chambres',
@@ -68,7 +81,7 @@ export const PROPERTIES = [
       'Forage',
       'Compteur prépayé',
     ],
-    images: [u('1600566753086-00f18fb6b3ea'), u('1502672260266-1c1ef2d93688'), u('1522708323590-d24dbb6b0267'), u('1584622650111-993a426fbf0a')],
+    images: [PHOTO.appartB, PHOTO.appartA, PHOTO.appartC, PHOTO.appartB],
   },
   {
     id: 'bonamoussadi-sable-3-chambres',
@@ -102,7 +115,7 @@ export const PROPERTIES = [
       'Gardien H/24 + caméras',
       'Possibilité bureaux',
     ],
-    images: [u('1600585154340-be6161a56a0c'), u('1600210492486-724fe5c67fb0'), u('1600047509807-ba8f99d2cdde'), u('1556909114-f6e7ad7d3136')],
+    images: [PHOTO.appartC, PHOTO.appartA, PHOTO.appartB, PHOTO.appartC],
   },
   {
     id: 'logpom-maison-jumelle-2-chambres',
@@ -134,7 +147,7 @@ export const PROPERTIES = [
       'Parking + forage prépayé',
       'Gardien, caméras, chiens',
     ],
-    images: [u('1600607687920-4e2a09cf159d'), u('1600607687939-ce8a6c25118c'), u('1560448204-e02f11c3d0e2'), u('1522708323590-d24dbb6b0267')],
+    images: [PHOTO.appartA, PHOTO.appartC, PHOTO.appartB, PHOTO.appartA],
   },
   {
     id: 'kotto-baden-baden-2-chambres',
@@ -164,7 +177,7 @@ export const PROPERTIES = [
       'Parking + forage prépayé',
       'Gardien de nuit',
     ],
-    images: [u('1600566753086-00f18fb6b3ea'), u('1493809842364-78817add7ffb'), u('1484154218962-a197022b5858'), u('1552321554-5fefe8c9ef14')],
+    images: [PHOTO.appartB, PHOTO.appartC, PHOTO.appartA, PHOTO.appartB],
   },
   {
     id: 'logpom-duplex-5-chambres',
@@ -197,7 +210,7 @@ export const PROPERTIES = [
       'Forage prépayé',
       'Idéal activité commerciale',
     ],
-    images: [u('1613490493576-7fde63acd811'), u('1600210492486-724fe5c67fb0'), u('1600047509807-ba8f99d2cdde'), u('1600607687920-4e2a09cf159d')],
+    images: [PHOTO.villaB, PHOTO.appartB, PHOTO.appartA, PHOTO.villaA],
   },
   {
     id: 'logpom-appartement-neuf-2-chambres',
@@ -229,7 +242,7 @@ export const PROPERTIES = [
       'Salle des fêtes dans l’immeuble',
       'Studios disponibles (150 000)',
     ],
-    images: [u('1600596542815-ffad4c1539a9'), u('1600607687939-ce8a6c25118c'), u('1556909114-f6e7ad7d3136'), u('1522708323590-d24dbb6b0267')],
+    images: [PHOTO.appartC, PHOTO.appartA, PHOTO.appartB, PHOTO.appartC],
   },
   {
     id: 'logbessou-rdc-3-chambres',
@@ -261,7 +274,7 @@ export const PROPERTIES = [
       'Compteur prépayé',
       'Chauffage d’eau',
     ],
-    images: [u('1580587771525-78b9dba3b914'), u('1600566753086-00f18fb6b3ea'), u('1484154218962-a197022b5858'), u('1560448204-e02f11c3d0e2')],
+    images: [PHOTO.appartA, PHOTO.appartB, PHOTO.appartC, PHOTO.appartA],
   },
   {
     id: 'logbessou-2-chambres',
@@ -294,7 +307,7 @@ export const PROPERTIES = [
       'Gardien',
       'Compteur',
     ],
-    images: [u('1600585154340-be6161a56a0c'), u('1600607687920-4e2a09cf159d'), u('1493809842364-78817add7ffb'), u('1584622650111-993a426fbf0a')],
+    images: [PHOTO.appartB, PHOTO.appartA, PHOTO.appartC, PHOTO.appartB],
   },
   {
     id: 'logbessou-nickel-oil-2-chambres',
@@ -325,7 +338,7 @@ export const PROPERTIES = [
       'Salle des fêtes disponible',
       'Visite sur rendez-vous',
     ],
-    images: [u('1512917774080-9991f1c4c750'), u('1600607687939-ce8a6c25118c'), u('1600047509807-ba8f99d2cdde'), u('1556909114-f6e7ad7d3136')],
+    images: [PHOTO.appartC, PHOTO.appartB, PHOTO.appartA, PHOTO.appartC],
   },
   {
     id: 'kotto-mbangue-4-chambres',
@@ -354,7 +367,7 @@ export const PROPERTIES = [
       'Convient pour activité commerciale',
       'Ouverture de dossier : 10 000 FCFA',
     ],
-    images: [u('1560518883-ce09059eeffa'), u('1600566753086-00f18fb6b3ea'), u('1522708323590-d24dbb6b0267'), u('1484154218962-a197022b5858')],
+    images: [PHOTO.appartA, PHOTO.appartC, PHOTO.appartB, PHOTO.appartA],
   },
   {
     id: 'makepe-montana-studios',
@@ -386,7 +399,7 @@ export const PROPERTIES = [
       'Forage prépayé',
       'Gardien',
     ],
-    images: [u('1502672260266-1c1ef2d93688'), u('1600566753086-00f18fb6b3ea'), u('1560448204-e02f11c3d0e2'), u('1522708323590-d24dbb6b0267')],
+    images: [PHOTO.studio, PHOTO.appartA, PHOTO.appartB, PHOTO.appartC],
   },
   {
     id: 'bonamoussadi-local-commercial',
@@ -419,7 +432,7 @@ export const PROPERTIES = [
       'Gardien',
       'Usage commercial uniquement',
     ],
-    images: [u('1512918728675-ed5a9ecdebfd'), u('1600210492486-724fe5c67fb0'), u('1556909114-f6e7ad7d3136'), u('1600047509807-ba8f99d2cdde')],
+    images: [PHOTO.local, PHOTO.appartA, PHOTO.appartB, PHOTO.local],
   },
   {
     id: 'bonaberi-terrain-500',
@@ -447,7 +460,7 @@ export const PROPERTIES = [
       'Proche des axes principaux',
       'Convient habitation ou investissement',
     ],
-    images: [u('1500382017468-9049fed747ef'), u('1466692476868-aef1dfb1e735')],
+    images: [PHOTO.terrainA, PHOTO.terrainB],
   },
   {
     id: 'yassa-terrain-800',
@@ -474,7 +487,7 @@ export const PROPERTIES = [
       'Zone en développement',
       'Idéal investissement foncier',
     ],
-    images: [u('1466692476868-aef1dfb1e735'), u('1500382017468-9049fed747ef')],
+    images: [PHOTO.terrainB, PHOTO.terrainA],
   },
   {
     id: 'bonapriso-villa-5-chambres',
@@ -503,7 +516,7 @@ export const PROPERTIES = [
       'Jardin et parking',
       'Quartier résidentiel privilégié',
     ],
-    images: [u('1613490493576-7fde63acd811'), u('1583608205776-bfd35f0d9f83'), u('1600210492486-724fe5c67fb0'), u('1600047509807-ba8f99d2cdde')],
+    images: [PHOTO.villaA, PHOTO.villaB, PHOTO.appartA, PHOTO.appartB],
   },
   {
     id: 'akwa-local-commercial',
@@ -531,7 +544,7 @@ export const PROPERTIES = [
       'Idéal boutique, bureau ou service',
       'Électricité et eau',
     ],
-    images: [u('1502005229762-cf1b2da7c5d6'), u('1600607687939-ce8a6c25118c'), u('1556909114-f6e7ad7d3136')],
+    images: [PHOTO.local, PHOTO.appartA, PHOTO.appartB],
   },
   {
     id: 'bonamoussadi-salle-fetes',
@@ -560,7 +573,7 @@ export const PROPERTIES = [
       'Sanitaires',
       'Location à la journée',
     ],
-    images: [u('1586023492125-27b2c045efd7'), u('1600210492486-724fe5c67fb0'), u('1600607687920-4e2a09cf159d'), u('1600047509807-ba8f99d2cdde')],
+    images: [PHOTO.salle, PHOTO.appartB, PHOTO.appartA, PHOTO.salle],
   },
   {
     id: 'bonaberi-terrain-300',
@@ -582,7 +595,7 @@ export const PROPERTIES = [
     description:
       "Terrain titré de 300 m² à Bonabéri, dans un secteur résidentiel calme et déjà viabilisé. Idéal pour une première construction ou un placement foncier.",
     features: ['Superficie 300 m²', 'Titre foncier disponible', 'Secteur résidentiel calme', 'Déjà viabilisé', 'Accès véhiculé'],
-    images: [u('1500382017468-9049fed747ef'), u('1466692476868-aef1dfb1e735')],
+    images: [PHOTO.terrainA, PHOTO.terrainB],
   },
   {
     id: 'logbessou-terrain-600',
@@ -604,7 +617,7 @@ export const PROPERTIES = [
     description:
       "Beau terrain de 600 m² à Logbessou, à quelques minutes du goudron, dans une zone en pleine expansion. Convient pour un immeuble locatif ou une résidence familiale.",
     features: ['Superficie 600 m²', 'Proche du goudron', 'Zone en pleine expansion', 'Convient immeuble locatif', 'Dossier vérifié'],
-    images: [u('1466692476868-aef1dfb1e735'), u('1416879595882-3373a0480b5b')],
+    images: [PHOTO.terrainB, PHOTO.terrainA],
   },
   {
     id: 'kotto-terrain-450',
@@ -626,7 +639,7 @@ export const PROPERTIES = [
     description:
       "Terrain viabilisé de 450 m² à Kotto, sur une voie carrossable et proche des commodités (marché, écoles, transport). Prêt pour démarrer vos travaux.",
     features: ['Superficie 450 m²', 'Voie carrossable', 'Proche marché et écoles', 'Eau et électricité à proximité', 'Prêt à bâtir'],
-    images: [u('1416879595882-3373a0480b5b'), u('1500382017468-9049fed747ef')],
+    images: [PHOTO.terrainA, PHOTO.terrainB],
   },
   {
     id: 'yassa-terrain-1000',
@@ -648,7 +661,7 @@ export const PROPERTIES = [
     description:
       "Grande parcelle de 1 000 m² à Yassa, dans un secteur aéré et en développement. Parfaite pour un projet d'habitat groupé ou un investissement à moyen terme.",
     features: ['Superficie 1 000 m²', 'Secteur aéré', 'Idéal habitat groupé', 'Investissement à moyen terme', 'Bornage effectué'],
-    images: [u('1465146344425-f00d5f5c8f07'), u('1592595896551-12b371d546d5')],
+    images: [PHOTO.terrainB, PHOTO.terrainA],
   },
   {
     id: 'ndogpassi-terrain-700',
@@ -670,7 +683,7 @@ export const PROPERTIES = [
     description:
       "Terrain de 700 m² à Ndogpassi, proche de l'axe principal. Ce bien a déjà trouvé acquéreur — d'autres parcelles comparables sont disponibles sur demande.",
     features: ['Superficie 700 m²', 'Proche axe principal', 'Dossier à jour', 'Bien vendu — autres parcelles disponibles'],
-    images: [u('1592595896551-12b371d546d5'), u('1470071459604-3b5ec3a7fe05')],
+    images: [PHOTO.terrainA, PHOTO.terrainB],
   },
   {
     id: 'logpom-studio-meuble',
@@ -692,7 +705,7 @@ export const PROPERTIES = [
     description:
       "Studio meublé et tout équipé à louer à Logpom, à 200 m du goudron. Idéal pour un séjour professionnel ou un étudiant : vous n'avez qu'à poser vos valises.",
     features: ['Entièrement meublé', 'Lit, armoire, coin cuisine', 'Climatisation', 'Eau chaude', 'Connexion internet', 'Compteur prépayé', 'Gardien'],
-    images: [u('1502672260266-1c1ef2d93688'), u('1522708323590-d24dbb6b0267'), u('1560448204-e02f11c3d0e2')],
+    images: [PHOTO.studio, PHOTO.appartA, PHOTO.appartB],
   },
   {
     id: 'bonamoussadi-studio-neuf',
@@ -714,7 +727,7 @@ export const PROPERTIES = [
     description:
       "Studio neuf haut standing à louer à Bonamoussadi, sur le goudron. Finitions modernes, immeuble sécurisé et emplacement central très pratique.",
     features: ['Studio neuf', 'Cuisine moderne', 'Climatisation', 'Balcon personnel', 'Parking', 'Forage prépayé', 'Gardien H/24 + caméras'],
-    images: [u('1584622650111-993a426fbf0a'), u('1552321554-5fefe8c9ef14'), u('1556909114-f6e7ad7d3136')],
+    images: [PHOTO.studio, PHOTO.appartC, PHOTO.appartA],
   },
   {
     id: 'makepe-studio-meuble',
@@ -736,7 +749,7 @@ export const PROPERTIES = [
     description:
       "Studio meublé à Makepe, proche des commerces et du transport. Ce studio a déjà trouvé locataire — d'autres studios similaires sont disponibles dans le même immeuble.",
     features: ['Entièrement meublé', 'Climatisation', 'Cuisine équipée', 'Proche commerces et transport', 'Déjà prise — autres studios disponibles'],
-    images: [u('1552321554-5fefe8c9ef14'), u('1502672260266-1c1ef2d93688'), u('1560448204-e02f11c3d0e2')],
+    images: [PHOTO.studio, PHOTO.appartB, PHOTO.appartC],
   },
   {
     id: 'akwa-chambre-meublee',
@@ -758,7 +771,7 @@ export const PROPERTIES = [
     description:
       "Chambre meublée à louer en plein centre d'Akwa, à deux pas des banques, restaurants et bureaux. Solution idéale pour un jeune actif ou un séjour de courte durée.",
     features: ['Chambre meublée', 'Douche privative', 'Ventilateur et climatisation', 'Eau et électricité incluses', 'Sécurité', 'Très central'],
-    images: [u('1560448204-e02f11c3d0e2'), u('1584622650111-993a426fbf0a')],
+    images: [PHOTO.chambre, PHOTO.appartC],
   },
   {
     id: 'bonapriso-chambre-meublee',
@@ -780,7 +793,7 @@ export const PROPERTIES = [
     description:
       "Chambre meublée climatisée à Bonapriso, quartier résidentiel calme et sécurisé. Confort immédiat, charges maîtrisées et environnement agréable.",
     features: ['Chambre meublée', 'Climatisation', 'Douche privative', 'Quartier calme et sécurisé', 'Charges maîtrisées'],
-    images: [u('1522708323590-d24dbb6b0267'), u('1556909114-f6e7ad7d3136')],
+    images: [PHOTO.chambre, PHOTO.appartA],
   },
   {
     id: 'logbessou-chambre-meublee',
@@ -802,7 +815,7 @@ export const PROPERTIES = [
     description:
       "Chambre meublée à louer à Logbessou, dans une maison calme avec cour. Bon rapport qualité-prix pour un étudiant ou un travailleur.",
     features: ['Chambre meublée', 'Cour commune', 'Eau et électricité', 'Compteur prépayé', 'Proche transport'],
-    images: [u('1584622650111-993a426fbf0a'), u('1502672260266-1c1ef2d93688')],
+    images: [PHOTO.chambre, PHOTO.appartC],
   },
   {
     id: 'yassa-villa-4-chambres',
@@ -824,7 +837,7 @@ export const PROPERTIES = [
     description:
       "Villa moderne de 4 chambres à vendre à Yassa, sur un terrain titré de 600 m². Construction récente, finitions soignées et environnement résidentiel tranquille.",
     features: ['4 chambres avec placards', '3 salles d’eau', 'Grand séjour', 'Cuisine équipée', 'Terrain titré 600 m²', 'Jardin et parking', 'Forage'],
-    images: [u('1568605114967-8130f3a36994'), u('1570129477492-45c003edd2be'), u('1564013799919-ab600027ffc6')],
+    images: [PHOTO.villaB, PHOTO.villaA, PHOTO.appartA],
   },
   {
     id: 'bonamoussadi-appartement-vente',
@@ -846,7 +859,7 @@ export const PROPERTIES = [
     description:
       "Appartement de 3 chambres à vendre à Bonamoussadi, dans un immeuble bien entretenu et sécurisé. Excellent placement locatif ou résidence principale.",
     features: ['3 chambres avec placards', '2 douches', 'Séjour spacieux', 'Cuisine équipée', 'Parking', 'Gardien', 'Titre disponible'],
-    images: [u('1523217582562-09d0def993a6'), u('1582268611958-ebfd161ef9cf'), u('1600607687939-ce8a6c25118c')],
+    images: [PHOTO.appartB, PHOTO.appartC, PHOTO.appartA],
   },
 ];
 

@@ -39,7 +39,8 @@ export const NAV_LINKS = [
   { label: 'Contact', to: '/contact' },
 ];
 
-const img = (id) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1200&q=80`;
+// Visuels générés — ambiance camerounaise (Douala)
+const m = (id) => `https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/${id}_generated_image.png`;
 
 export const SERVICES = [
   {
@@ -52,43 +53,43 @@ export const SERVICES = [
     icon: 'Store',
     title: 'Chambres meublées & studios',
     desc: 'Solutions rapides et confortables pour étudiants, travailleurs et séjours de courte ou moyenne durée.',
-    image: img('1502672260266-1c1ef2d93688'),
+    image: m('748c05530'),
   },
   {
     icon: 'Home',
     title: 'Vente de maisons et villas',
     desc: 'Sélection de maisons et villas pour habitation ou investissement, présentées avec toutes les informations utiles.',
-    image: img('1613490493576-7fde63acd811'),
+    image: m('f92bb80a3'),
   },
   {
     icon: 'Trees',
     title: 'Vente de terrains',
     desc: 'Terrains situés dans les zones en développement de Douala, avec accompagnement dans vos démarches.',
-    image: img('1500382017468-9049fed747ef'),
+    image: m('688b79bb8'),
   },
   {
     icon: 'Key',
     title: 'Gestion immobilière',
     desc: "Confiez-nous votre bien : mise en location, suivi des occupants, entretien et reporting transparent.",
-    image: img('1560518883-ce09059eeffa'),
+    image: m('a2734701f'),
   },
   {
     icon: 'UserCheck',
     title: 'Accompagnement personnalisé',
     desc: "Un interlocuteur dédié vous guide de la recherche du logement jusqu'à la signature et l'installation.",
-    image: img('1521737711867-e3b97375f902'),
+    image: m('6facec2dc'),
   },
   {
     icon: 'PartyPopper',
     title: 'Location événementielle',
     desc: "Salles des fêtes et espaces aménagés pour vos cérémonies, séminaires et événements privés.",
-    image: img('1519167758481-83f550bb49b3'),
+    image: m('83f0e750d'),
   },
   {
     icon: 'Briefcase',
     title: 'Locaux commerciaux & bureaux',
     desc: 'Espaces professionnels adaptés aux commerces, cliniques, crèches, restaurants et centres de formation.',
-    image: img('1497366754035-f200968a6e72'),
+    image: m('a6572444b'),
   },
 ];
 

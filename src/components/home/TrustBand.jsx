@@ -3,7 +3,8 @@ import Reveal from '@/components/Reveal';
 import { Image } from '@/components/ui/image';
 import { PROPERTIES } from '@/data/properties';
 
-const img = (id) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1000&q=80`;
+// Visuels générés — ambiance camerounaise (Douala)
+const m = (id) => `https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/${id}_generated_image.png`;
 
 export default function TrustBand() {
   const available = PROPERTIES.filter((p) => p.status === 'disponible').length;
@@ -21,25 +22,25 @@ export default function TrustBand() {
       icon: Building2,
       title: 'Des biens vérifiés',
       desc: 'Chaque logement est visité et documenté avant publication.',
-      image: img('1600585154340-be6161a56a0c'),
+      image: m('2b44faf5c'),
     },
     {
       icon: ShieldCheck,
       title: 'Des informations claires',
       desc: 'Prix, charges, équipements et conditions affichés sans surprise.',
-      image: img('1450101499163-c8848c66ca85'),
+      image: m('0f3779e62'),
     },
     {
       icon: Handshake,
       title: 'Un accompagnement',
       desc: "De la recherche jusqu'à l'installation, nous restons disponibles.",
-      image: img('1521737711867-e3b97375f902'),
+      image: m('40c7f9b98'),
     },
     {
       icon: MapPin,
       title: 'Une présence locale',
       desc: 'Deux agences à Douala, au plus près de vos besoins.',
-      image: img('1449824913935-59a10b8d2000'),
+      image: m('324a3d92b'),
     },
   ];
 

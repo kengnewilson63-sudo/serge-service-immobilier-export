@@ -3,7 +3,7 @@ import { CheckCircle2, MapPin } from 'lucide-react';
 import HeroSearch from '@/components/home/HeroSearch';
 import { SITE } from '@/data/site';
 
-const BG = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2000&q=80';
+const BG = 'https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/e6a16752c_generated_image.png';
 
 export default function Hero() {
   return (

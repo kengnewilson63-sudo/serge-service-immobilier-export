@@ -8,7 +8,7 @@ import { Image } from '@/components/ui/image';
 import { CONTACT, SITE } from '@/data/site';
 import { PROPERTIES } from '@/data/properties';
 
-const IMG = 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1400&q=80';
+const IMG = 'https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/40c7f9b98_generated_image.png';
 
 const VALUES = [
   { icon: ShieldCheck, title: 'Confiance', desc: "Des biens visités et des informations vérifiées avant toute publication." },
