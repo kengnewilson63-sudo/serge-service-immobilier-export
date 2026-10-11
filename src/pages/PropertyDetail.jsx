@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import ContactButtons from '@/components/ContactButtons';
 import Seo from '@/components/Seo';
-import { listingJsonLd } from '@/lib/seo';
+import { listingJsonLd, breadcrumbJsonLd } from '@/lib/seo';
 import PropertyCard from '@/components/PropertyCard';
 import Reveal from '@/components/Reveal';
 import { Button } from '@/components/ui/button';
@@ -45,6 +45,7 @@ export default function PropertyDetail() {
   }
 
   const related = PROPERTIES.filter((p) => p.id !== property.id && p.transaction === property.transaction).slice(0, 3);
+  const txPhrase = property.transaction === 'vente' ? 'à vendre' : 'à louer';
   const visitMessage = `Bonjour, je souhaiterais demander une visite pour « ${property.title} » situé à ${property.neighborhood}, ${property.city} (${property.priceLabel}). Quelles sont vos disponibilités ?`;
 
   const specs = [
@@ -57,10 +58,20 @@ export default function PropertyDetail() {
   return (
     <>
       <Seo
-        title={`${property.title} — ${property.priceLabel} | Serge Service Immobilier`}
-        description={`${property.type} ${property.transaction === 'vente' ? 'à vendre' : property.transaction === 'location' ? 'à louer' : 'à louer'} à ${property.neighborhood}, ${property.city}.${property.rooms > 0 ? ` ${property.rooms} chambres,` : ''} ${property.area} m². ${property.terms}. Contact direct WhatsApp.`}
+        title={`${property.type} ${txPhrase} à ${property.neighborhood}, Douala — ${property.priceLabel} | S.S.I`}
+        description={`${property.type} ${txPhrase} à ${property.neighborhood}, ${property.city} : ${property.rooms > 0 ? `${property.rooms} chambres, ` : ''}${property.area} m². ${property.priceLabel} (${property.terms}). ${property.features.slice(0, 3).join(', ')}. Visite organisée — contact direct WhatsApp.`}
+        keywords={`${property.type} ${txPhrase} Douala, ${property.type} ${property.neighborhood}, immobilier ${property.neighborhood}, location ${property.neighborhood} Douala, ${property.type} ${property.city}`}
+        image={property.images[0]}
+        type="article"
         path={`/biens/${property.id}`}
-        jsonLd={listingJsonLd(property)}
+        jsonLd={[
+          listingJsonLd(property),
+          breadcrumbJsonLd([
+            { name: 'Accueil', path: '/' },
+            { name: 'Biens immobiliers', path: '/biens' },
+            { name: `${property.type} ${txPhrase} à ${property.neighborhood}`, path: `/biens/${property.id}` },
+          ]),
+        ]}
       />
       <section className="border-b border-border bg-secondary/40 py-5">
         <div className="container-x flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">

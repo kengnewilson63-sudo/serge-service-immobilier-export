@@ -10,14 +10,18 @@ import Reveal from '@/components/Reveal';
 import SectionHeading from '@/components/SectionHeading';
 import { Button } from '@/components/ui/button';
 import Seo from '@/components/Seo';
+import { HOME_JSON_LD, OG_IMAGE } from '@/lib/seo';
 
 export default function Home() {
   return (
     <>
       <Seo
-        title="Serge Service Immobilier — Location & vente immobilière à Douala"
-        description="Appartements, studios et chambres meublées à louer, maisons, villas et terrains à vendre à Douala. Serge Service Immobilier vous accompagne de la recherche à la remise des clés."
+        title="Immobilier à Douala — Location & vente | Serge Service Immobilier"
+        description="Location d'appartements, studios et chambres meublées, vente de maisons, villas et terrains à Douala : Makepe, Logpom, Bonamoussadi, Kotto, Bonabéri. Visite organisée et contact direct WhatsApp."
+        keywords="immobilier Douala, appartement à louer Douala, location appartement Douala, studio meublé Douala, chambre meublée Douala, maison à vendre Douala, villa Douala, terrain à vendre Douala, agence immobilière Douala"
+        image={OG_IMAGE.home}
         path="/"
+        jsonLd={HOME_JSON_LD}
       />
       <Hero />
       <TrustBand />

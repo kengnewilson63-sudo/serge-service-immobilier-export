@@ -7,6 +7,7 @@ import SectionHeading from '@/components/SectionHeading';
 import CtaBand from '@/components/home/CtaBand';
 import { Button } from '@/components/ui/button';
 import Seo from '@/components/Seo';
+import { SERVICES_JSON_LD, SERVICES_PAGE_JSON_LD, OG_IMAGE, breadcrumbJsonLd } from '@/lib/seo';
 
 const STEPS = [
   { icon: Search, title: '1. Vous recherchez', desc: 'Parcourez le catalogue et filtrez selon votre budget, votre quartier et vos besoins.' },
@@ -19,9 +20,19 @@ export default function Services() {
   return (
     <>
       <Seo
-        title="Nos services immobiliers à Douala | Serge Service Immobilier"
-        description="Location d'appartements, studios et chambres meublées, vente de maisons, villas et terrains, gestion immobilière, locaux commerciaux et location événementielle à Douala."
+        title="Services immobiliers à Douala | Serge Service Immobilier"
+        description="Location d'appartements, studios et chambres meublées, vente de maisons, villas et terrains, gestion locative, locaux commerciaux et salles des fêtes à Douala. Un accompagnement complet, de la recherche à la remise des clés."
+        keywords="services immobiliers Douala, gestion locative Douala, location appartement Douala, vente terrain Douala, local commercial Douala, salle des fêtes Douala, agence immobilière Douala"
+        image={OG_IMAGE.services}
         path="/services"
+        jsonLd={[
+          SERVICES_PAGE_JSON_LD,
+          SERVICES_JSON_LD,
+          breadcrumbJsonLd([
+            { name: 'Accueil', path: '/' },
+            { name: 'Services', path: '/services' },
+          ]),
+        ]}
       />
       <PageHero
         breadcrumb="Services"

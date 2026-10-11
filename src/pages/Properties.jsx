@@ -8,7 +8,7 @@ import TypeChips from '@/components/TypeChips';
 import Reveal from '@/components/Reveal';
 import { Button } from '@/components/ui/button';
 import Seo from '@/components/Seo';
-import { LISTINGS_JSON_LD } from '@/lib/seo';
+import { LISTINGS_JSON_LD, PROPERTIES_PAGE_JSON_LD, OG_IMAGE, breadcrumbJsonLd } from '@/lib/seo';
 import { PROPERTIES } from '@/data/properties';
 
 const unique = (key) => [...new Set(PROPERTIES.map((p) => p[key]))].sort();
@@ -96,9 +96,18 @@ export default function Properties() {
     <>
       <Seo
         title="Biens immobiliers à louer et à vendre à Douala | Serge Service Immobilier"
-        description="Découvrez nos appartements, studios, chambres meublées, duplex, maisons, villas, terrains et locaux commerciaux à Douala. Filtrez par quartier, budget et type de bien."
+        description="Catalogue de biens à Douala : appartements, studios, chambres meublées, duplex, maisons, villas, terrains et locaux commerciaux. Filtrez par quartier (Makepe, Logpom, Bonamoussadi, Kotto), budget et type de bien."
+        keywords="biens immobiliers Douala, appartement à louer Douala, studio à louer Douala, chambre meublée Douala, duplex Douala, maison à vendre Douala, villa Douala, terrain à vendre Douala, local commercial Douala, salle des fêtes Douala"
+        image={OG_IMAGE.biens}
         path="/biens"
-        jsonLd={LISTINGS_JSON_LD}
+        jsonLd={[
+          PROPERTIES_PAGE_JSON_LD,
+          LISTINGS_JSON_LD,
+          breadcrumbJsonLd([
+            { name: 'Accueil', path: '/' },
+            { name: 'Biens immobiliers', path: '/biens' },
+          ]),
+        ]}
       />
       <PageHero
         breadcrumb="Biens immobiliers"

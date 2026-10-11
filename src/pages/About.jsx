@@ -4,6 +4,7 @@ import Reveal from '@/components/Reveal';
 import SectionHeading from '@/components/SectionHeading';
 import CtaBand from '@/components/home/CtaBand';
 import Seo from '@/components/Seo';
+import { ABOUT_JSON_LD, OG_IMAGE, breadcrumbJsonLd } from '@/lib/seo';
 import { Image } from '@/components/ui/image';
 import { CONTACT, SITE } from '@/data/site';
 import { PROPERTIES } from '@/data/properties';
@@ -23,9 +24,18 @@ export default function About() {
   return (
     <>
       <Seo
-        title="À propos de Serge Service Immobilier — Agence immobilière à Douala"
-        description="Serge Service Immobilier (S.S.I) est une agence immobilière basée à Douala, spécialisée dans la location, la vente et la gestion de biens dans tout le Littoral."
+        title="À propos — Agence immobilière à Douala | Serge Service Immobilier"
+        description="Serge Service Immobilier (S.S.I) est une agence immobilière basée à Douala, spécialisée dans la location, la vente et la gestion de biens à Makepe, Logpom, Bonamoussadi, Kotto et dans tout le Littoral."
+        keywords="agence immobilière Douala, Serge Service Immobilier, S.S.I, agence immobilière Cameroun, courtier immobilier Douala, agence immobilière Littoral"
+        image={OG_IMAGE.apropos}
         path="/a-propos"
+        jsonLd={[
+          ABOUT_JSON_LD,
+          breadcrumbJsonLd([
+            { name: 'Accueil', path: '/' },
+            { name: 'À propos', path: '/a-propos' },
+          ]),
+        ]}
       />
       <PageHero
         breadcrumb="À propos"

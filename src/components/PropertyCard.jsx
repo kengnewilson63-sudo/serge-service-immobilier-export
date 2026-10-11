@@ -14,10 +14,11 @@ export default function PropertyCard({ property }) {
       className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl">
       
       <div className="relative aspect-[4/3] overflow-hidden">
-        <Image src="https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/54382dcd0_WhatsApp_Image_2026-10-02_at_173426__2_.jpeg"
-
-        alt={property.title}
-        className="h-full w-full transition-transform duration-700 group-hover:scale-105" />
+        <Image
+          src={property.images?.[0] || 'https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/54382dcd0_WhatsApp_Image_2026-10-02_at_173426__2_.jpeg'}
+          alt={`${property.title} — ${TRANSACTION_LABEL[property.transaction]} à ${property.neighborhood}, Douala`}
+          className="h-full w-full transition-transform duration-700 group-hover:scale-105"
+        />
         
         <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
           <span className="rounded-full bg-navy/85 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-white backdrop-blur">
