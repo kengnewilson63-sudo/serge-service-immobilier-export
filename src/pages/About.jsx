@@ -6,8 +6,9 @@ import CtaBand from '@/components/home/CtaBand';
 import Seo from '@/components/Seo';
 import { ABOUT_JSON_LD, OG_IMAGE, breadcrumbJsonLd } from '@/lib/seo';
 import { Image } from '@/components/ui/image';
+import { useEffect, useState } from 'react';
 import { CONTACT, SITE } from '@/data/site';
-import { PROPERTIES } from '@/data/properties';
+import { fetchCatalogStats } from '@/lib/properties';
 
 const IMG = 'https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/40c7f9b98_generated_image.png';
 
@@ -19,7 +20,11 @@ const VALUES = [
 ];
 
 export default function About() {
-  const neighborhoods = new Set(PROPERTIES.map((p) => p.neighborhood)).size;
+  const [neighborhoods, setNeighborhoods] = useState(null);
+
+  useEffect(() => {
+    fetchCatalogStats().then((stats) => setNeighborhoods(stats.neighborhoods));
+  }, []);
 
   return (
     <>
@@ -52,7 +57,7 @@ export default function About() {
                 <Image src={IMG} alt="Serge Service Immobilier à Douala" className="aspect-[4/3] w-full" />
               </div>
               <div className="absolute -bottom-6 -right-4 hidden rounded-2xl border border-border bg-card p-6 shadow-xl sm:block">
-                <p className="font-heading text-3xl font-extrabold text-primary">{neighborhoods}</p>
+                <p className="font-heading text-3xl font-extrabold text-primary">{neighborhoods ?? '—'}</p>
                 <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Quartiers couverts
                 </p>

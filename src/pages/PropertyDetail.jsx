@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
   Bath,
@@ -7,6 +7,7 @@ import {
   CalendarCheck,
   CheckCircle2,
   ChevronRight,
+  Loader2,
   Mail,
   MapPin,
   Maximize,
@@ -21,7 +22,7 @@ import Reveal from '@/components/Reveal';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Image } from '@/components/ui/image';
-import { PROPERTIES, getPropertyById } from '@/data/properties';
+import { fetchRelated, getPropertyBySlug } from '@/lib/properties';
 import { CONTACT, formatPrice, telLink, waLink } from '@/data/site';
 
 const TRANSACTION_LABEL = { location: 'À louer', vente: 'À vendre', evenement: 'Événementiel' };
@@ -29,8 +30,37 @@ const STATUS_LABEL = { disponible: 'Disponible', prise: 'Déjà prise', vendu: '
 
 export default function PropertyDetail() {
   const { id } = useParams();
-  const property = getPropertyById(id);
+  const [property, setProperty] = useState(null);
+  const [related, setRelated] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
+    setActive(0);
+    (async () => {
+      const found = await getPropertyBySlug(id);
+      if (!alive) return;
+      setProperty(found);
+      setLoading(false);
+      if (found) {
+        const others = await fetchRelated(found);
+        if (alive) setRelated(others);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [id]);
+
+  if (loading) {
+    return (
+      <section className="container-x flex justify-center py-32">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </section>
+    );
+  }
 
   if (!property) {
     return (
@@ -44,7 +74,6 @@ export default function PropertyDetail() {
     );
   }
 
-  const related = PROPERTIES.filter((p) => p.id !== property.id && p.transaction === property.transaction).slice(0, 3);
   const txPhrase = property.transaction === 'vente' ? 'à vendre' : 'à louer';
   const visitMessage = `Bonjour, je souhaiterais demander une visite pour « ${property.title} » situé à ${property.neighborhood}, ${property.city} (${property.priceLabel}). Quelles sont vos disponibilités ?`;
 
@@ -217,7 +246,7 @@ export default function PropertyDetail() {
             <h2 className="font-heading text-2xl font-bold text-navy">Biens similaires</h2>
             <div className="mt-8 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((p, i) => (
-                <Reveal key={p.id} delay={i * 0.06}>
+                <Reveal key={p.recordId} delay={i * 0.06}>
                   <PropertyCard property={p} />
                 </Reveal>
               ))}

@@ -1,4 +1,3 @@
-import { PROPERTIES } from '@/data/properties';
 import { SERVICES } from '@/data/site';
 
 export const SITE_URL = 'https://serge-home-flow.base44.app';
@@ -42,24 +41,24 @@ export const listingJsonLd = (p) => ({
   offers: offer(p),
 });
 
-export const LISTINGS_JSON_LD = {
+export const listingsJsonLd = (items = []) => ({
   '@context': 'https://schema.org',
   '@type': 'ItemList',
   name: 'Biens immobiliers à Douala — Serge Service Immobilier',
-  numberOfItems: PROPERTIES.length,
-  itemListElement: PROPERTIES.map((p, i) => ({
+  numberOfItems: items.length,
+  itemListElement: items.map((p, i) => ({
     '@type': 'ListItem',
     position: i + 1,
     item: {
       '@type': 'RealEstateListing',
       name: p.title,
       url: `${SITE_URL}/biens/${p.id}`,
-      image: p.images[0],
+      image: p.images?.[0],
       address: address(p),
       offers: offer(p),
     },
   })),
-};
+});
 
 export const webPageJsonLd = ({ type = 'WebPage', name, description, path }) => ({
   '@context': 'https://schema.org',

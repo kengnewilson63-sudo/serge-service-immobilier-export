@@ -1,13 +1,18 @@
+import { useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PropertyCard from '@/components/PropertyCard';
 import Reveal from '@/components/Reveal';
 import SectionHeading from '@/components/SectionHeading';
 import { Button } from '@/components/ui/button';
-import { PROPERTIES } from '@/data/properties';
+import { fetchFeatured } from '@/lib/properties';
 
 export default function FeaturedProperties() {
-  const featured = PROPERTIES.filter((p) => p.featured).slice(0, 6);
+  const [featured, setFeatured] = useState([]);
+
+  useEffect(() => {
+    fetchFeatured(6).then(setFeatured);
+  }, []);
 
   return (
     <section className="bg-secondary/40 py-20 sm:py-24">
@@ -29,7 +34,7 @@ export default function FeaturedProperties() {
 
         <div className="mt-12 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
           {featured.map((property, i) => (
-            <Reveal key={property.id} delay={i * 0.07}>
+            <Reveal key={property.recordId} delay={i * 0.07}>
               <PropertyCard property={property} />
             </Reveal>
           ))}

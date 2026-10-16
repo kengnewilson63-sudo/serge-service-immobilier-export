@@ -1,0 +1,120 @@
+{
+  "name": "Property",
+  "type": "object",
+  "properties": {
+    "slug": {
+      "type": "string",
+      "description": "Identifiant lisible utilis\u00e9 dans l'adresse de l'annonce"
+    },
+    "title": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "Appartement",
+        "Studio",
+        "Chambre",
+        "Duplex",
+        "Maison",
+        "Terrain",
+        "Local",
+        "Salle des f\u00eates"
+      ]
+    },
+    "transaction": {
+      "type": "string",
+      "enum": [
+        "location",
+        "vente",
+        "evenement"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "disponible",
+        "prise",
+        "vendu"
+      ],
+      "default": "disponible"
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false
+    },
+    "region": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "neighborhood": {
+      "type": "string"
+    },
+    "price": {
+      "type": "number"
+    },
+    "terms": {
+      "type": "string"
+    },
+    "rooms": {
+      "type": "number",
+      "default": 0
+    },
+    "bathrooms": {
+      "type": "number",
+      "default": 0
+    },
+    "area": {
+      "type": "number",
+      "default": 0
+    },
+    "contact": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "position": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "title",
+    "type",
+    "transaction",
+    "price"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

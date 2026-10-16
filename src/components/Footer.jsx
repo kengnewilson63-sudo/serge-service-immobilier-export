@@ -107,7 +107,10 @@ export default function Footer() {
       <div className="border-t border-white/10">
         <div className="container-x flex flex-col items-center justify-between gap-3 py-6 text-xs text-white/50 sm:flex-row">
           <p>© {new Date().getFullYear()} {SITE.name} — Tous droits réservés.</p>
-          <p>{SITE.tagline}</p>
+          <div className="flex items-center gap-4">
+            <Link to="/admin" className="transition-colors hover:text-accent">Espace agence</Link>
+            <p>{SITE.tagline}</p>
+          </div>
         </div>
       </div>
     </footer>

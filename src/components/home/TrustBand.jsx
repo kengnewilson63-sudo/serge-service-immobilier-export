@@ -1,18 +1,22 @@
+import { useEffect, useState } from 'react';
 import { Building2, Handshake, MapPin, ShieldCheck } from 'lucide-react';
 import Reveal from '@/components/Reveal';
 import { Image } from '@/components/ui/image';
-import { PROPERTIES } from '@/data/properties';
+import { fetchCatalogStats } from '@/lib/properties';
 
 // Visuels générés — ambiance camerounaise (Douala)
 const m = (id) => `https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/${id}_generated_image.png`;
 
 export default function TrustBand() {
-  const available = PROPERTIES.filter((p) => p.status === 'disponible').length;
-  const neighborhoods = new Set(PROPERTIES.map((p) => p.neighborhood)).size;
+  const [catalog, setCatalog] = useState(null);
+
+  useEffect(() => {
+    fetchCatalogStats().then(setCatalog);
+  }, []);
 
   const stats = [
-    { value: `${available}+`, label: 'Biens disponibles' },
-    { value: `${neighborhoods}`, label: 'Quartiers couverts' },
+    { value: catalog ? `${catalog.available}+` : '—', label: 'Biens disponibles' },
+    { value: catalog ? `${catalog.neighborhoods}` : '—', label: 'Quartiers couverts' },
     { value: '2', label: 'Agences à Douala' },
     { value: '1', label: 'Interlocuteur dédié' },
   ];

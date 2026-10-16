@@ -1,6 +1,6 @@
-import { useMemo, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { SearchX } from 'lucide-react';
+import { Loader2, SearchX } from 'lucide-react';
 import PageHero from '@/components/PageHero';
 import PropertyCard from '@/components/PropertyCard';
 import PropertyFilters from '@/components/PropertyFilters';
@@ -8,26 +8,14 @@ import TypeChips from '@/components/TypeChips';
 import Reveal from '@/components/Reveal';
 import { Button } from '@/components/ui/button';
 import Seo from '@/components/Seo';
-import { LISTINGS_JSON_LD, PROPERTIES_PAGE_JSON_LD, OG_IMAGE, breadcrumbJsonLd } from '@/lib/seo';
-import { PROPERTIES } from '@/data/properties';
+import { PROPERTIES_PAGE_JSON_LD, OG_IMAGE, breadcrumbJsonLd, listingsJsonLd } from '@/lib/seo';
+import { PAGE_SIZE, countProperties, fetchFilterOptions, fetchProperties } from '@/lib/properties';
 
-const unique = (key) => [...new Set(PROPERTIES.map((p) => p[key]))].sort();
-
-const EMPTY = {
-  keyword: '',
-  transaction: '',
-  type: '',
-  region: '',
-  city: '',
-  neighborhood: '',
-  maxPrice: '',
-  rooms: '',
-  minArea: '',
-  status: '',
-};
+const EMPTY_OPTIONS = { types: [], regions: [], cities: [], neighborhoods: [] };
 
 export default function Properties() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const queryKey = searchParams.toString();
 
   const filters = {
     keyword: searchParams.get('q') || '',
@@ -42,6 +30,16 @@ export default function Properties() {
     status: searchParams.get('statut') || '',
   };
 
+  const [options, setOptions] = useState(EMPTY_OPTIONS);
+  const [results, setResults] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [cursor, setCursor] = useState(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  const resultsRef = useRef(null);
+
   const update = (key, value) => {
     const next = new URLSearchParams(searchParams);
     if (value) next.set(key, value);
@@ -51,8 +49,6 @@ export default function Properties() {
 
   const reset = () => setSearchParams(new URLSearchParams(), { replace: true });
 
-  const resultsRef = useRef(null);
-
   const selectType = (value) => {
     update('type', value);
     requestAnimationFrame(() => {
@@ -60,37 +56,36 @@ export default function Properties() {
     });
   };
 
-  const options = useMemo(
-    () => ({
-      types: unique('type'),
-      regions: unique('region'),
-      cities: unique('city'),
-      neighborhoods: unique('neighborhood'),
-    }),
-    []
-  );
+  useEffect(() => {
+    fetchFilterOptions().then(setOptions);
+  }, []);
 
-  const results = useMemo(() => {
-    const kw = filters.keyword.trim().toLowerCase();
-    return PROPERTIES.filter((p) => {
-      if (filters.transaction && p.transaction !== filters.transaction) return false;
-      if (filters.type && p.type !== filters.type) return false;
-      if (filters.region && p.region !== filters.region) return false;
-      if (filters.city && p.city !== filters.city) return false;
-      if (filters.neighborhood && p.neighborhood !== filters.neighborhood) return false;
-      if (filters.maxPrice && p.price > Number(filters.maxPrice)) return false;
-      if (filters.rooms && p.rooms < Number(filters.rooms)) return false;
-      if (filters.minArea && p.area < Number(filters.minArea)) return false;
-      if (filters.status && p.status !== filters.status) return false;
-      if (kw) {
-        const haystack = [p.title, p.type, p.neighborhood, p.city, p.description, ...p.features]
-          .join(' ')
-          .toLowerCase();
-        if (!haystack.includes(kw)) return false;
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
+    Promise.all([fetchProperties(filters, { limit: PAGE_SIZE }), countProperties(filters)]).then(
+      ([page, count]) => {
+        if (!alive) return;
+        setResults(page.items);
+        setCursor(page.next_cursor);
+        setHasMore(page.has_more);
+        setTotal(count);
+        setLoading(false);
       }
-      return true;
-    });
-  }, [filters.keyword, filters.transaction, filters.type, filters.region, filters.city, filters.neighborhood, filters.maxPrice, filters.rooms, filters.minArea, filters.status]);
+    );
+    return () => {
+      alive = false;
+    };
+  }, [queryKey]);
+
+  const loadMore = async () => {
+    setLoadingMore(true);
+    const page = await fetchProperties(filters, { limit: PAGE_SIZE, cursor });
+    setResults((prev) => [...prev, ...page.items]);
+    setCursor(page.next_cursor);
+    setHasMore(page.has_more);
+    setLoadingMore(false);
+  };
 
   return (
     <>
@@ -102,7 +97,7 @@ export default function Properties() {
         path="/biens"
         jsonLd={[
           PROPERTIES_PAGE_JSON_LD,
-          LISTINGS_JSON_LD,
+          listingsJsonLd(results),
           breadcrumbJsonLd([
             { name: 'Accueil', path: '/' },
             { name: 'Biens immobiliers', path: '/biens' },
@@ -125,12 +120,16 @@ export default function Properties() {
 
           <div ref={resultsRef} className="mt-10 scroll-mt-28">
             <p className="text-sm text-muted-foreground">
-              <span className="font-heading text-lg font-bold text-navy">{results.length}</span>{' '}
-              bien{results.length > 1 ? 's' : ''} correspondant à votre recherche
+              <span className="font-heading text-lg font-bold text-navy">{total}</span>{' '}
+              bien{total > 1 ? 's' : ''} correspondant à votre recherche
             </p>
           </div>
 
-          {results.length === 0 ? (
+          {loading ? (
+            <div className="mt-10 flex justify-center py-16">
+              <Loader2 className="h-7 w-7 animate-spin text-primary" />
+            </div>
+          ) : results.length === 0 ? (
             <div className="mt-8 flex flex-col items-center rounded-2xl border border-dashed border-border bg-card py-20 text-center">
               <SearchX className="h-10 w-10 text-muted-foreground" />
               <h3 className="mt-4 font-heading text-lg font-semibold text-navy">Aucun bien ne correspond</h3>
@@ -142,13 +141,29 @@ export default function Properties() {
               </Button>
             </div>
           ) : (
-            <div className="mt-8 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
-              {results.map((property, i) => (
-                <Reveal key={property.id} delay={Math.min(i, 6) * 0.05}>
-                  <PropertyCard property={property} />
-                </Reveal>
-              ))}
-            </div>
+            <>
+              <div className="mt-8 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
+                {results.map((property, i) => (
+                  <Reveal key={property.recordId} delay={Math.min(i, 6) * 0.05}>
+                    <PropertyCard property={property} />
+                  </Reveal>
+                ))}
+              </div>
+
+              {hasMore && (
+                <div className="mt-10 flex justify-center">
+                  <Button
+                    onClick={loadMore}
+                    disabled={loadingMore}
+                    variant="outline"
+                    className="border-primary/25 text-primary hover:bg-primary/5"
+                  >
+                    {loadingMore && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Afficher plus de biens
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>

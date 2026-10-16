@@ -1,26 +1,17 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import Reveal from '@/components/Reveal';
 import SectionHeading from '@/components/SectionHeading';
 import { Image } from '@/components/ui/image';
-import { PROPERTIES } from '@/data/properties';
+import { fetchNeighborhoodStats } from '@/lib/properties';
 
 export default function Neighborhoods() {
-  const available = PROPERTIES.filter((p) => p.status === 'disponible');
+  const [list, setList] = useState([]);
 
-  const counts = available.reduce((acc, p) => {
-    acc[p.neighborhood] = (acc[p.neighborhood] || 0) + 1;
-    return acc;
-  }, {});
-
-  const list = Object.entries(counts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 6)
-    .map(([name, count]) => ({
-      name,
-      count,
-      image: available.find((p) => p.neighborhood === name).images[0],
-    }));
+  useEffect(() => {
+    fetchNeighborhoodStats(6).then(setList);
+  }, []);
 
   return (
     <section className="py-20 sm:py-24">
