@@ -1,15 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Menu, MessageCircle, Phone, X } from 'lucide-react';
+import { LayoutDashboard, Menu, MessageCircle, Phone, X } from 'lucide-react';
 import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/lib/AuthContext';
 import { NAV_LINKS, PRIMARY, SITE, telLink, waLink } from '@/data/site';
 
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { pathname } = useLocation();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
 
   useEffect(() => setOpen(false), [pathname]);
 
@@ -55,6 +58,15 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
+          {isAdmin && (
+            <Link
+              to="/admin"
+              className="hidden items-center gap-2 rounded-lg border border-primary/25 px-3.5 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/5 sm:inline-flex"
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              Espace agence
+            </Link>
+          )}
           <a
             href={telLink(PRIMARY.tel)}
             className="hidden items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-navy transition-colors hover:text-primary xl:flex"
@@ -104,6 +116,14 @@ export default function Header() {
                 </NavLink>
               ))}
               <div className="mt-3 flex flex-col gap-3 border-t border-border pt-5">
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    className="flex items-center gap-2 rounded-lg border border-primary/25 px-4 py-3 text-base font-semibold text-primary"
+                  >
+                    <LayoutDashboard className="h-4 w-4" /> Espace agence
+                  </Link>
+                )}
                 <Button asChild className="bg-[#25D366] text-white hover:bg-[#1da851]">
                   <a href={waLink('Bonjour Serge Service Immobilier, je souhaiterais des informations.')} target="_blank" rel="noopener noreferrer">
                     <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
