@@ -1,9 +1,13 @@
 import { Link } from 'react-router-dom';
 import { Facebook, Mail, MapPin, MessageCircle, Music2, Phone } from 'lucide-react';
 import Logo from '@/components/Logo';
+import { useAuth } from '@/lib/AuthContext';
 import { CONTACT, NAV_LINKS, SERVICES, SITE, telLink, waLink } from '@/data/site';
 
 export default function Footer() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
+
   return (
     <footer className="bg-navy text-white/75">
       <div className="container-x grid gap-12 py-16 md:grid-cols-2 lg:grid-cols-4">
@@ -108,7 +112,9 @@ export default function Footer() {
         <div className="container-x flex flex-col items-center justify-between gap-3 py-6 text-xs text-white/50 sm:flex-row">
           <p>© {new Date().getFullYear()} {SITE.name} — Tous droits réservés.</p>
           <div className="flex items-center gap-4">
-            <Link to="/admin" className="transition-colors hover:text-accent">Espace agence</Link>
+            {isAdmin && (
+              <Link to="/admin" className="transition-colors hover:text-accent">Espace agence</Link>
+            )}
             <p>{SITE.tagline}</p>
           </div>
         </div>
