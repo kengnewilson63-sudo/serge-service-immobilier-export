@@ -1,14 +1,44 @@
-import { SERVICES } from '@/data/site';
+import { CONTACT, SERVICES } from '@/data/site';
 
-export const SITE_URL = 'https://serge-home-flow.base44.app';
+// L'URL publique du site : indispensable pour le SEO (canonical, sitemap, JSON-LD).
+// En production, définissez VITE_SITE_URL=https://votre-domaine.cm
+const env = /** @type {any} */ (import.meta).env || {};
+
+export const SITE_URL = String(
+  env.VITE_SITE_URL || (env.DEV ? '' : 'https://serge-home-flow.base44.app')
+).replace(/\/+$/, '');
+
+/**
+ * Origine publique du site. En développement, '' → les pages canoniques restent des
+ * chemins relatifs (/biens) au lieu de pointer vers le site encore en ligne.
+ */
+const origin = () => SITE_URL || (typeof window !== 'undefined' ? window.location.origin : '');
+/** Origine publique utilisée par toutes les balises de référencement. */
+export const siteOrigin = origin;
 export const SITE_NAME = 'Serge Service Immobilier';
 
+/**
+ * Rend absolue une URL de photo. Un chemin /uploads/… (photo envoyée au backend) est
+ * rendu absolu dès que l'URL du site est connue ; sinon l'image reste servie par le
+ * même serveur que la page.
+ */
+export const absoluteUrl = (url) => {
+  if (!url) return '';
+  if (/^(https?:|data:)/i.test(url)) return url;
+  const path = url.startsWith('/') ? url : `/${url}`;
+  const base = origin();
+  return base ? `${base}${path}` : path;
+};
+
+// Images de partage (Open Graph) : fichiers du dossier public/images/.
+const img = (path) => `${origin()}/images/${path}`;
+
 export const OG_IMAGE = {
-  home: 'https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/e6a16752c_generated_image.png',
-  biens: 'https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/350ddceba_WhatsAppImage2026-10-02at1734262.jpeg',
-  services: 'https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/748c05530_generated_image.png',
-  apropos: 'https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/40c7f9b98_generated_image.png',
-  contact: 'https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/cb1abc266_WhatsAppImage2026-10-02at171404.jpeg',
+  home: img('hero.jpg'),
+  biens: img('biens/bien-1.jpg'),
+  services: img('hero.jpg'),
+  apropos: img('biens/bien-1.jpg'),
+  contact: img('logo.jpg'),
 };
 
 const availability = (status) =>
@@ -32,8 +62,8 @@ export const listingJsonLd = (p) => ({
   '@context': 'https://schema.org',
   '@type': 'RealEstateListing',
   name: p.title,
-  url: `${SITE_URL}/biens/${p.id}`,
-  image: p.images,
+  url: `${origin()}/biens/${p.id}`,
+  image: (p.images || []).map(absoluteUrl),
   description: p.description,
   numberOfRooms: p.rooms || undefined,
   floorSize: { '@type': 'QuantitativeValue', value: p.area, unitCode: 'MTK' },
@@ -52,8 +82,8 @@ export const listingsJsonLd = (items = []) => ({
     item: {
       '@type': 'RealEstateListing',
       name: p.title,
-      url: `${SITE_URL}/biens/${p.id}`,
-      image: p.images?.[0],
+      url: `${origin()}/biens/${p.id}`,
+      image: absoluteUrl(p.images?.[0]),
       address: address(p),
       offers: offer(p),
     },
@@ -63,14 +93,14 @@ export const listingsJsonLd = (items = []) => ({
 export const webPageJsonLd = ({ type = 'WebPage', name, description, path }) => ({
   '@context': 'https://schema.org',
   '@type': type,
-  '@id': `${SITE_URL}${path}#page`,
-  url: `${SITE_URL}${path}`,
+  '@id': `${origin()}${path}#page`,
+  url: `${origin()}${path}`,
   name,
   description,
   inLanguage: 'fr',
-  isPartOf: { '@id': `${SITE_URL}/#website` },
-  about: { '@id': `${SITE_URL}/#agence` },
-  publisher: { '@id': `${SITE_URL}/#agence` },
+  isPartOf: { '@id': `${origin()}/#website` },
+  about: { '@id': `${origin()}/#agence` },
+  publisher: { '@id': `${origin()}/#agence` },
 });
 
 export const breadcrumbJsonLd = (items) => ({
@@ -80,7 +110,7 @@ export const breadcrumbJsonLd = (items) => ({
     '@type': 'ListItem',
     position: index + 1,
     name: item.name,
-    item: `${SITE_URL}${item.path}`,
+    item: `${origin()}${item.path}`,
   })),
 });
 
@@ -97,7 +127,7 @@ export const SERVICES_JSON_LD = {
       name: s.title,
       description: s.desc,
       serviceType: s.title,
-      provider: { '@id': `${SITE_URL}/#agence` },
+      provider: { '@id': `${origin()}/#agence` },
       areaServed: [
         { '@type': 'City', name: 'Douala' },
         { '@type': 'AdministrativeArea', name: 'Littoral' },
@@ -145,3 +175,40 @@ export const CONTACT_JSON_LD = webPageJsonLd({
     'Deux agences à Douala : Cité des Palmiers et Logpom Bassong. Appel et WhatsApp au 681 28 45 14 et 695 92 90 01.',
   path: '/contact',
 });
+
+/** Fiche agence (RealEstateAgent) — insérée sur la page d'accueil avec le WebPage. */
+export const ORGANIZATION_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': ['RealEstateAgent', 'LocalBusiness'],
+  '@id': `${origin()}/#agence`,
+  name: SITE_NAME,
+  alternateName: 'S.S.I',
+  url: `${origin()}/`,
+  image: img('logo.jpg'),
+  logo: img('logo.jpg'),
+  telephone: CONTACT.phones.map((p) => p.tel),
+  email: CONTACT.email,
+  priceRange: '55 000 - 250 000 000 XAF',
+  currenciesAccepted: 'XAF',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Cité des Palmiers, derrière le lycée',
+    addressLocality: 'Douala',
+    addressRegion: 'Littoral',
+    addressCountry: 'CM',
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: 4.0511, longitude: 9.7679 },
+  areaServed: [
+    { '@type': 'City', name: 'Douala' },
+    { '@type': 'AdministrativeArea', name: 'Littoral' },
+  ],
+  knowsLanguage: ['fr', 'en'],
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+      opens: '08:00',
+      closes: '18:00',
+    },
+  ],
+};

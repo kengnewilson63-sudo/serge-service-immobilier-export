@@ -6,11 +6,26 @@ import SectionHeading from '@/components/SectionHeading';
 import { Image } from '@/components/ui/image';
 import { fetchNeighborhoodStats } from '@/lib/properties';
 
+// Photos locales pour les quartiers principaux (public/images/). Elles servent de
+// secours quand aucun bien du quartier n'a encore de photo, et prennent le pas
+// sur la photo d'un bien : le visuel reste stable et choisi par l'agence.
+const NEIGHBORHOOD_IMAGES = {
+  Makepe: '/images/wilson1.jpg',
+  Logpom: '/images/montana2.jpg',
+};
+
 export default function Neighborhoods() {
   const [list, setList] = useState([]);
 
   useEffect(() => {
-    fetchNeighborhoodStats(6).then(setList);
+    fetchNeighborhoodStats(6).then((rows) =>
+      setList(
+        rows.map((r) => ({
+          ...r,
+          image: NEIGHBORHOOD_IMAGES[r.name] || r.image || '/images/biens/bien-1.jpg',
+        }))
+      )
+    );
   }, []);
 
   return (

@@ -37,6 +37,7 @@ export default function Properties() {
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState('');
 
   const resultsRef = useRef(null);
 
@@ -63,16 +64,25 @@ export default function Properties() {
   useEffect(() => {
     let alive = true;
     setLoading(true);
-    Promise.all([fetchProperties(filters, { limit: PAGE_SIZE }), countProperties(filters)]).then(
-      ([page, count]) => {
+    setError('');
+    Promise.all([fetchProperties(filters, { limit: PAGE_SIZE }), countProperties(filters)])
+      .then(([page, count]) => {
         if (!alive) return;
-        setResults(page.items);
-        setCursor(page.next_cursor);
-        setHasMore(page.has_more);
-        setTotal(count);
-        setLoading(false);
-      }
-    );
+        setResults(page?.items ?? []);
+        setCursor(page?.next_cursor ?? null);
+        setHasMore(!!page?.has_more);
+        setTotal(count ?? 0);
+      })
+      .catch((err) => {
+        if (!alive) return;
+        console.error('Chargement des biens impossible:', err);
+        setResults([]);
+        setTotal(0);
+        setError('Impossible de charger les biens pour le moment. Réessayez dans un instant.');
+      })
+      .finally(() => {
+        if (alive) setLoading(false);
+      });
     return () => {
       alive = false;
     };
@@ -80,11 +90,17 @@ export default function Properties() {
 
   const loadMore = async () => {
     setLoadingMore(true);
-    const page = await fetchProperties(filters, { limit: PAGE_SIZE, cursor });
-    setResults((prev) => [...prev, ...page.items]);
-    setCursor(page.next_cursor);
-    setHasMore(page.has_more);
-    setLoadingMore(false);
+    try {
+      const page = await fetchProperties(filters, { limit: PAGE_SIZE, cursor });
+      setResults((prev) => [...prev, ...(page?.items ?? [])]);
+      setCursor(page?.next_cursor ?? null);
+      setHasMore(!!page?.has_more);
+    } catch (err) {
+      console.error('Chargement des biens impossible:', err);
+      setError('Impossible de charger la suite des biens.');
+    } finally {
+      setLoadingMore(false);
+    }
   };
 
   return (
@@ -128,6 +144,18 @@ export default function Properties() {
           {loading ? (
             <div className="mt-10 flex justify-center py-16">
               <Loader2 className="h-7 w-7 animate-spin text-primary" />
+            </div>
+          ) : error ? (
+            <div className="mt-8 flex flex-col items-center rounded-2xl border border-dashed border-border bg-card py-20 text-center">
+              <SearchX className="h-10 w-10 text-muted-foreground" />
+              <h3 className="mt-4 font-heading text-lg font-semibold text-navy">Catalogue indisponible</h3>
+              <p className="mt-2 max-w-md text-sm text-muted-foreground">{error}</p>
+              <Button
+                onClick={() => setSearchParams(new URLSearchParams(searchParams), { replace: false })}
+                className="mt-6 bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                Réessayer
+              </Button>
             </div>
           ) : results.length === 0 ? (
             <div className="mt-8 flex flex-col items-center rounded-2xl border border-dashed border-border bg-card py-20 text-center">

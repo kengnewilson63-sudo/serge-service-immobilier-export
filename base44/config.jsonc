@@ -1,5 +1,5 @@
 {
-  "name": "base44-app",
+  "name": "Serge Service Immobilier",
   "site": {
     "installCommand": "npm install",
     "buildCommand": "npm run build",

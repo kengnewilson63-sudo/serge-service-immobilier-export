@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom';
-import { Facebook, Mail, MapPin, MessageCircle, Music2, Phone } from 'lucide-react';
+import { Facebook, Mail, MapPin, MessageCircle, Phone } from 'lucide-react';
 import Logo from '@/components/Logo';
+import TikTokIcon from '@/components/icons/TikTokIcon';
 import { useAuth } from '@/lib/AuthContext';
+import { isAdminUser } from '@/lib/user-role';
 import { CONTACT, NAV_LINKS, SERVICES, SITE, telLink, waLink } from '@/data/site';
 
 export default function Footer() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = isAdminUser(user);
 
   return (
     <footer className="bg-navy text-white/75">
@@ -24,7 +26,7 @@ export default function Footer() {
             la vente de terrains et l'accompagnement immobilier personnalisé.
           </p>
           <div className="mt-6 flex gap-3">
-            {CONTACT.socials.map((s) => (
+            {CONTACT.socials.filter((s) => s.href).map((s) => (
               <a
                 key={s.label}
                 href={s.href}
@@ -33,7 +35,7 @@ export default function Footer() {
                 aria-label={s.label}
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 text-white/80 transition-colors hover:border-accent hover:bg-accent hover:text-accent-foreground"
               >
-                {s.label === 'Facebook' ? <Facebook className="h-4 w-4" /> : <Music2 className="h-4 w-4" />}
+                {s.label === 'Facebook' ? <Facebook className="h-4 w-4" /> : <TikTokIcon className="h-4 w-4" />}
               </a>
             ))}
           </div>

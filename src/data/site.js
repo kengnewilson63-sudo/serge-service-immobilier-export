@@ -1,9 +1,18 @@
+// Toutes les images du site vivent dans public/images/. Pour changer une photo,
+// il suffit de remplacer le fichier dans ce dossier (même nom = aucune ligne de
+// code à modifier).
+export const IMAGES = {
+  logo: '/images/logo.jpg',
+  hero: '/images/hero.jpg',
+  fallback: '/images/biens/bien-1.jpg',
+};
+
 export const SITE = {
   name: 'Serge Service Immobilier',
   short: 'S.S.I',
   slogan: 'Votre espace, notre priorité.',
   tagline: 'Votre partenaire immobilier de confiance.',
-  logo: 'https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/cb1abc266_WhatsAppImage2026-10-02at171404.jpeg',
+  logo: IMAGES.logo,
 };
 
 export const CONTACT = {
@@ -11,12 +20,18 @@ export const CONTACT = {
     { label: '681 28 45 14', tel: '+237681284514', wa: '237681284514' },
     { label: '695 92 90 01', tel: '+237695929001', wa: '237695929001' },
   ],
-  email: 'contact@sergeserviceimmo.cm',
+  email: 'youmbiserges9@gmail.com',
   hq: 'Douala — Cité des Palmiers (derrière le lycée)',
   branch: 'Douala — Logpom Bassong',
   socials: [
-    { label: 'Facebook', href: 'https://www.facebook.com/' },
-    { label: 'TikTok', href: 'https://www.tiktok.com/' },
+    {
+      label: 'Facebook',
+      href: 'https://web.facebook.com/people/Serge-service-immobilier/61587397095151/',
+    },
+    {
+      label: 'TikTok',
+      href: 'https://www.tiktok.com/@sergeserviceimmobilier?_r=1&_t=ZN-9AjpQHUeM58',
+    },
   ],
 };
 
@@ -39,57 +54,46 @@ export const NAV_LINKS = [
   { label: 'Contact', to: '/contact' },
 ];
 
-// Visuels générés — ambiance camerounaise (Douala)
-const m = (id) => `https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/${id}_generated_image.png`;
-
 export const SERVICES = [
   {
     icon: 'Building2',
     title: "Location d'appartements",
     desc: "Des appartements vérifiés à Douala, du studio au duplex, avec visite organisée et accompagnement jusqu'à la remise des clés.",
-    image: 'https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/350ddceba_WhatsAppImage2026-10-02at1734262.jpeg',
   },
   {
     icon: 'Store',
     title: 'Chambres meublées & studios',
     desc: 'Solutions rapides et confortables pour étudiants, travailleurs et séjours de courte ou moyenne durée.',
-    image: m('748c05530'),
   },
   {
     icon: 'Home',
     title: 'Vente de maisons et villas',
     desc: 'Sélection de maisons et villas pour habitation ou investissement, présentées avec toutes les informations utiles.',
-    image: m('f92bb80a3'),
   },
   {
     icon: 'Trees',
     title: 'Vente de terrains',
     desc: 'Terrains situés dans les zones en développement de Douala, avec accompagnement dans vos démarches.',
-    image: m('688b79bb8'),
   },
   {
     icon: 'Key',
     title: 'Gestion immobilière',
     desc: "Confiez-nous votre bien : mise en location, suivi des occupants, entretien et reporting transparent.",
-    image: m('a2734701f'),
   },
   {
     icon: 'UserCheck',
     title: 'Accompagnement personnalisé',
     desc: "Un interlocuteur dédié vous guide de la recherche du logement jusqu'à la signature et l'installation.",
-    image: m('6facec2dc'),
   },
   {
     icon: 'PartyPopper',
     title: 'Location événementielle',
     desc: "Salles des fêtes et espaces aménagés pour vos cérémonies, séminaires et événements privés.",
-    image: m('83f0e750d'),
   },
   {
     icon: 'Briefcase',
     title: 'Locaux commerciaux & bureaux',
     desc: 'Espaces professionnels adaptés aux commerces, cliniques, crèches, restaurants et centres de formation.',
-    image: m('a6572444b'),
   },
 ];
 

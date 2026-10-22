@@ -39,9 +39,9 @@ export default function Contact() {
   return (
     <>
       <Seo
-        title="Contact — Agence immobilière à Douala | Serge Service Immobilier"
-        description="Contactez Serge Service Immobilier à Douala pour une location, une vente ou une visite. Deux agences : Cité des Palmiers et Logpom Bassong. Appel et WhatsApp 681 28 45 14 / 695 92 90 01."
-        keywords="contact agence immobilière Douala, téléphone agence immobilière Douala, WhatsApp immobilier Douala, visite appartement Douala, numéro agence immobilière Douala"
+        title="Contact — Agence immobilière Cité des Palmiers, Douala | Serge Service Immobilier"
+        description="Contactez Serge Service Immobilier, agence immobilière à la Cité des Palmiers (Douala), pour une location, une vente ou une visite. Deux agences : Cité des Palmiers et Logpom Bassong. Appel et WhatsApp 681 28 45 14 / 695 92 90 01."
+        keywords="contact agence immobilière Cité des Palmiers, agence immobilière Douala, téléphone agence immobilière Douala, WhatsApp immobilier Douala, visite appartement Douala, numéro agence immobilière Douala"
         image={OG_IMAGE.contact}
         path="/contact"
         jsonLd={[

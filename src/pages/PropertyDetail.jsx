@@ -23,10 +23,12 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Image } from '@/components/ui/image';
 import { fetchRelated, getPropertyBySlug } from '@/lib/properties';
-import { CONTACT, formatPrice, telLink, waLink } from '@/data/site';
+import { CONTACT, IMAGES, formatPrice, telLink, waLink } from '@/data/site';
 
 const TRANSACTION_LABEL = { location: 'À louer', vente: 'À vendre', evenement: 'Événementiel' };
 const STATUS_LABEL = { disponible: 'Disponible', prise: 'Déjà prise', vendu: 'Vendu' };
+
+const FALLBACK_IMAGE = IMAGES.fallback;
 
 export default function PropertyDetail() {
   const { id } = useParams();
@@ -34,6 +36,8 @@ export default function PropertyDetail() {
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState(0);
+  const images = property?.images?.length ? property.images : [FALLBACK_IMAGE];
+  const activeImage = images[Math.min(active, images.length - 1)];
 
   useEffect(() => {
     let alive = true;
@@ -87,12 +91,13 @@ export default function PropertyDetail() {
   return (
     <>
       <Seo
-        title={`${property.type} ${txPhrase} à ${property.neighborhood}, Douala — ${property.priceLabel} | S.S.I`}
-        description={`${property.type} ${txPhrase} à ${property.neighborhood}, ${property.city} : ${property.rooms > 0 ? `${property.rooms} chambres, ` : ''}${property.area} m². ${property.priceLabel} (${property.terms}). ${property.features.slice(0, 3).join(', ')}. Visite organisée — contact direct WhatsApp.`}
-        keywords={`${property.type} ${txPhrase} Douala, ${property.type} ${property.neighborhood}, immobilier ${property.neighborhood}, location ${property.neighborhood} Douala, ${property.type} ${property.city}`}
-        image={property.images[0]}
+        title={`${property.title} à ${property.neighborhood}, ${property.city} — agence immobilière Cité des Palmiers | Serge Service Immobilier`}
+        description={`${property.type} ${txPhrase} à ${property.neighborhood}, ${property.city} : ${property.rooms > 0 ? `${property.rooms} chambres, ` : ''}${property.area} m². ${property.priceLabel} (${property.terms}). ${(property.features || []).slice(0, 3).join(', ')}. Visite organisée — contact direct WhatsApp.`}
+        keywords={`${property.type} ${txPhrase} Douala, ${property.type} ${property.neighborhood}, agence immobilière Cité des Palmiers, immobilier ${property.neighborhood}, location ${property.neighborhood} Douala, ${property.type} ${property.city}`}
+        image={images[0]}
         type="article"
         path={`/biens/${property.id}`}
+        noindex={property.status === 'vendu' || property.status === 'prise'}
         jsonLd={[
           listingJsonLd(property),
           breadcrumbJsonLd([
@@ -138,7 +143,7 @@ export default function PropertyDetail() {
                   <DialogTrigger asChild>
                     <button type="button" className="block w-full cursor-zoom-in">
                       <Image
-                        src={property.images[active]}
+                        src={activeImage}
                         alt={property.title}
                         className="aspect-[16/10] w-full"
                       />
@@ -146,7 +151,7 @@ export default function PropertyDetail() {
                   </DialogTrigger>
                   <DialogContent className="max-w-4xl border-none bg-transparent p-0 shadow-none">
                     <Image
-                      src={property.images[active]}
+                      src={activeImage}
                       alt={property.title}
                       className="max-h-[80vh] w-full rounded-xl"
                       fittingType="fit"
@@ -155,9 +160,9 @@ export default function PropertyDetail() {
                 </Dialog>
               </div>
 
-              {property.images.length > 1 && (
+              {images.length > 1 && (
                 <div className="mt-4 grid grid-cols-4 gap-3">
-                  {property.images.map((img, i) => (
+                  {images.map((img, i) => (
                     <button
                       key={img}
                       type="button"
@@ -246,7 +251,7 @@ export default function PropertyDetail() {
             <h2 className="font-heading text-2xl font-bold text-navy">Biens similaires</h2>
             <div className="mt-8 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((p, i) => (
-                <Reveal key={p.recordId} delay={i * 0.06}>
+                <Reveal key={p.recordId ?? p.id} delay={i * 0.06}>
                   <PropertyCard property={p} />
                 </Reveal>
               ))}

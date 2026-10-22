@@ -5,6 +5,9 @@ import { PRIMARY, telLink, waLink } from '@/data/site';
 const defaultMessage =
   "Bonjour Serge Service Immobilier, je vous contacte via votre site. Je souhaiterais avoir des informations.";
 
+/**
+ * @param {{ property?: any, className?: string, size?: 'default'|'sm'|'lg'|'icon', stacked?: boolean }} props
+ */
 export default function ContactButtons({ property, className = '', size = 'default', stacked = false }) {
   const message = property
     ? `Bonjour, je suis intéressé(e) par « ${property.title} » situé à ${property.neighborhood}, ${property.city}, affiché à ${property.priceLabel}. Je souhaiterais avoir plus d'informations.`

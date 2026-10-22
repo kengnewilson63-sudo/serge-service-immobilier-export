@@ -11,14 +11,16 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [devResetUrl, setDevResetUrl] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await base44.auth.resetPasswordRequest(email);
+      const result = await base44.auth.resetPasswordRequest(email);
+      setDevResetUrl(result?.devResetUrl || "");
     } catch {
-      // Always show success regardless
+      // On affiche toujours le même message, que le compte existe ou non.
     } finally {
       setLoading(false);
       setSent(true);
@@ -37,9 +39,21 @@ export default function ForgotPassword() {
       }
     >
       {sent ? (
-        <p className="text-sm text-foreground text-center">
-          Si un compte existe avec cet e-mail, vous recevrez sous peu un lien de réinitialisation.
-        </p>
+        <div className="text-center">
+          <p className="text-sm text-foreground">
+            Si un compte existe avec cet e-mail, un lien de réinitialisation a été généré.
+          </p>
+          {devResetUrl && (
+            <div className="mt-4 rounded-lg border border-dashed border-border bg-muted/40 p-3 text-left">
+              <p className="text-xs font-medium text-muted-foreground">
+                Mode développement (aucun e-mail envoyé) :
+              </p>
+              <Link to={devResetUrl} className="mt-1 block text-sm text-primary hover:underline">
+                Ouvrir le lien de réinitialisation
+              </Link>
+            </div>
+          )}
+        </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">

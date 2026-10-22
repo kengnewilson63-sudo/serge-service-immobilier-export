@@ -1,6 +1,13 @@
 #env
 .env
 .env.*
+# Les gabarits d'exemple doivent être versionnés (les valeurs réelles restent locales).
+!.env.example
+!.env.production.example
+
+# Build et fichiers locaux du backend Spring Boot
+backend/target/
+backend/uploads/
 
 # Logs
 /logs
@@ -37,3 +44,8 @@ dist-ssr
 
 # Local link to a Base44 app, written by `base44 link`
 base44/.app.jsonc
+
+# Déploiement
+backend/frontend/
+backend/.env
+*.jar

@@ -53,7 +53,7 @@ const AuthenticatedApp = () => {
         <Route path="/services" element={<Services />} />
         <Route path="/a-propos" element={<About />} />
         <Route path="/contact" element={<Contact />} />
-        <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+        <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login?next=/admin" replace />} />}>
           <Route path="/admin" element={<Admin />} />
         </Route>
       </Route>

@@ -1,0 +1,63 @@
+# Déploiement en production : base + application.
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# 1. Copiez .env.example en .env et renseignez les valeurs (ADMIN_PASSWORD,
+#    JWT_SECRET, APP_PUBLIC_URL…).
+# 2. Le site est alors accessible sur http://<ip-du-serveur>:5170
+# 3. Pour un domaine + HTTPS, mettez Caddy ou nginx devant (voir DEPLOIEMENT.md).
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-serge_immobilier}
+      POSTGRES_USER: ${POSTGRES_USER:-serge}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Definissez POSTGRES_PASSWORD dans .env}
+    volumes:
+      - ssi_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-serge} -d ${POSTGRES_DB:-serge_immobilier}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-}
+        VITE_SITE_URL: ${VITE_SITE_URL:-}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-serge_immobilier}
+      DB_USERNAME: ${POSTGRES_USER:-serge}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:?Definissez POSTGRES_PASSWORD dans .env}
+      JWT_SECRET: ${JWT_SECRET:?Definissez JWT_SECRET dans .env}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@serge-immobilier.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Definissez ADMIN_PASSWORD dans .env}
+      # Accès de secours /admin (e-mail admin + code) : laisser vide pour désactiver.
+      SETUP_CODE: ${SETUP_CODE:-}
+      # Inscription publique : désactivée par défaut, seul l'admin crée les comptes.
+      ALLOW_REGISTRATION: ${ALLOW_REGISTRATION:-false}
+      # Balise de vérification Google Search Console (facultatif).
+      GOOGLE_SITE_VERIFICATION: ${GOOGLE_SITE_VERIFICATION:-}
+      APP_PUBLIC_URL: ${APP_PUBLIC_URL:-http://localhost:5170}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-no-reply@sergeserviceimmo.cm}
+      MAIL_EXPOSE_RESET_LINK: ${MAIL_EXPOSE_RESET_LINK:-false}
+    ports:
+      - "${APP_PORT:-5170}:8080"
+    volumes:
+      - ssi_uploads:/app/uploads
+
+volumes:
+  ssi_pgdata:
+  ssi_uploads:

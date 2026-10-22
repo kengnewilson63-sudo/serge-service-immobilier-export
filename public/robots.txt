@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://serge-home-flow.base44.app/sitemap.xml

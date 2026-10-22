@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ImagePlus, Loader2, Trash2, X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,9 @@ const slugify = (value) =>
     .replace(/^-|-$/g, '')
     .slice(0, 60);
 
+/**
+ * @param {{ label?: string, hint?: string, children?: React.ReactNode, className?: string }} props
+ */
 const Field = ({ label, hint, children, className = '' }) => (
   <label className={`flex flex-col gap-1.5 ${className}`}>
     <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
@@ -44,12 +47,48 @@ export default function PropertyForm({ record, onSaved, onCancel }) {
     area: record?.area ?? 0,
     contact: record?.contact || '+237681284514',
     description: record?.description || '',
-    features: (record?.features || []).join('\n'),
-    images: record?.images || [],
+    features: (Array.isArray(record?.features) ? record.features : []).join('\n'),
+    images: Array.isArray(record?.images) ? record.images : [],
   }));
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+
+  // Options des menus, enrichies avec la valeur actuelle du bien si elle n'est pas
+  // dans la liste (données importées / ancien format). Sinon le <select> n'afficherait
+  // aucune option sélectionnée et l'enregistrement serait refusé par le schéma.
+  const typeOptions = Array.from(new Set([...PROPERTY_TYPES, form.type].filter(Boolean)));
+  const transactionOptions = TRANSACTIONS.some((t) => t.value === form.transaction)
+    ? TRANSACTIONS
+    : [...TRANSACTIONS, { value: form.transaction, label: form.transaction }];
+  const statusOptions = STATUSES.some((s) => s.value === form.status)
+    ? STATUSES
+    : [...STATUSES, { value: form.status, label: form.status }];
+
+  // Réinitialise le formulaire quand on passe d'un bien à un autre (ou à « nouvelle annonce »),
+  // sinon les valeurs du bien précédent restent affichées.
+  useEffect(() => {
+    setForm({
+      title: record?.title || '',
+      type: record?.type || 'Appartement',
+      transaction: record?.transaction || 'location',
+      status: record?.status || 'disponible',
+      featured: !!record?.featured,
+      region: record?.region || 'Littoral',
+      city: record?.city || 'Douala',
+      neighborhood: record?.neighborhood || '',
+      price: record?.price ?? '',
+      terms: record?.terms || '',
+      rooms: record?.rooms ?? 0,
+      bathrooms: record?.bathrooms ?? 0,
+      area: record?.area ?? 0,
+      contact: record?.contact || '+237681284514',
+      description: record?.description || '',
+      features: (Array.isArray(record?.features) ? record.features : []).join('\n'),
+      images: Array.isArray(record?.images) ? record.images : [],
+    });
+    setError('');
+  }, [record]);
 
   const set = (key, value) => setForm((f) => ({ ...f, [key]: value }));
 
@@ -66,23 +105,43 @@ export default function PropertyForm({ record, onSaved, onCancel }) {
     setUploading(true);
     setError('');
     try {
-      const { file_url } = await base44.integrations.Core.UploadPublicFile({ file });
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setForm((f) => ({ ...f, images: [...f.images, file_url] }));
     } catch (err) {
-      setError(err.message || "L'image n'a pas pu être envoyée.");
+      console.error("Upload d'image impossible:", err);
+      setError(
+        err?.data?.message || err?.response?.data?.message || err?.message || "L'image n'a pas pu être envoyée."
+      );
     } finally {
       setUploading(false);
     }
   };
 
-  const uniqueSlug = async (base) => {
-    let slug = base || 'bien';
-    for (let n = 1; n < 50; n += 1) {
-      const { items } = await base44.entities.Property.filter({ slug }, { limit: 1, fields: ['slug'] });
-      if (!items.length) return slug;
-      slug = `${base}-${n + 1}`;
+  /**
+   * Trouve un slug libre. `ignoreId` exclut le bien en cours d'édition, sinon on
+   * se compare à soi-même et le slug renvoyé provoque un conflit à l'enregistrement.
+   * On ne renomme jamais un bien qui possède déjà un slug unique (l'URL publique
+   * doit rester stable), on n'ajoute un suffixe qu'en cas de vrai conflit.
+   */
+  const uniqueSlug = async (base, ignoreId) => {
+    const root = base || 'bien';
+
+    // Vérifie si le slug de base est libre pour ce bien.
+    const isFree = async (candidate) => {
+      const { items } = await base44.entities.Property.filter(
+        { slug: candidate },
+        { limit: 50, fields: ['id', 'slug'] }
+      );
+      return !(items ?? []).some((item) => String(item.id) !== String(ignoreId));
+    };
+
+    if (await isFree(root)) return root;
+
+    for (let n = 2; n < 50; n += 1) {
+      const candidate = `${root}-${n}`;
+      if (await isFree(candidate)) return candidate;
     }
-    return `${base}-${Date.now().toString(36)}`;
+    return `${root}-${Date.now().toString(36)}`;
   };
 
   const handleSubmit = async (event) => {
@@ -94,25 +153,31 @@ export default function PropertyForm({ record, onSaved, onCancel }) {
     }
     setSaving(true);
     try {
+      const baseSlug = record?.slug || slugify(form.title);
       const payload = {
-        slug: record?.slug || (await uniqueSlug(slugify(form.title))),
+        slug: await uniqueSlug(baseSlug, record?.id),
         title: form.title.trim(),
         type: form.type,
         transaction: form.transaction,
         status: form.status,
         featured: form.featured,
-        region: form.region.trim(),
-        city: form.city.trim(),
-        neighborhood: form.neighborhood.trim(),
+        region: String(form.region ?? '').trim(),
+        city: String(form.city ?? '').trim(),
+        neighborhood: String(form.neighborhood ?? '').trim(),
         price: Number(form.price) || 0,
-        terms: form.terms.trim(),
+        terms: String(form.terms ?? '').trim(),
         rooms: Number(form.rooms) || 0,
         bathrooms: Number(form.bathrooms) || 0,
         area: Number(form.area) || 0,
-        contact: form.contact.trim(),
-        description: form.description.trim(),
-        features: form.features.split('\n').map((s) => s.trim()).filter(Boolean),
-        images: form.images.map((s) => s.trim()).filter(Boolean),
+        contact: String(form.contact ?? '').trim(),
+        description: String(form.description ?? '').trim(),
+        features: String(form.features ?? '')
+          .split('\n')
+          .map((s) => s.trim())
+          .filter(Boolean),
+        images: (Array.isArray(form.images) ? form.images : [])
+          .map((s) => String(s ?? '').trim())
+          .filter(Boolean),
         position: record?.position ?? 0,
       };
 
@@ -120,7 +185,20 @@ export default function PropertyForm({ record, onSaved, onCancel }) {
       else await base44.entities.Property.create(payload);
       onSaved();
     } catch (err) {
-      setError(err.message || "L'enregistrement a échoué.");
+      console.error("Enregistrement de l'annonce impossible:", err);
+      let msg =
+        err?.data?.message ||
+        err?.response?.data?.message ||
+        err?.message ||
+        "L'enregistrement a échoué.";
+      if (err?.status === 401 || err?.status === 403) {
+        msg =
+          "Votre session n'est plus valide (ou ce compte n'est pas administrateur). " +
+          'Déconnectez-vous, reconnectez-vous puis republiez l’annonce.';
+      } else if (err?.status === 404) {
+        msg = "Cette annonce n'existe plus sur le serveur. Rechargez la page puis recommencez.";
+      }
+      setError(msg);
       setSaving(false);
     }
   };
@@ -148,7 +226,7 @@ export default function PropertyForm({ record, onSaved, onCancel }) {
 
         <Field label="Type de bien">
           <select className={selectClass} value={form.type} onChange={(e) => set('type', e.target.value)}>
-            {PROPERTY_TYPES.map((t) => (
+            {typeOptions.map((t) => (
               <option key={t} value={t}>{t}</option>
             ))}
           </select>
@@ -156,7 +234,7 @@ export default function PropertyForm({ record, onSaved, onCancel }) {
 
         <Field label="Transaction">
           <select className={selectClass} value={form.transaction} onChange={(e) => set('transaction', e.target.value)}>
-            {TRANSACTIONS.map((t) => (
+            {transactionOptions.map((t) => (
               <option key={t.value} value={t.value}>{t.label}</option>
             ))}
           </select>
@@ -164,7 +242,7 @@ export default function PropertyForm({ record, onSaved, onCancel }) {
 
         <Field label="Disponibilité">
           <select className={selectClass} value={form.status} onChange={(e) => set('status', e.target.value)}>
-            {STATUSES.map((s) => (
+            {statusOptions.map((s) => (
               <option key={s.value} value={s.value}>{s.label}</option>
             ))}
           </select>

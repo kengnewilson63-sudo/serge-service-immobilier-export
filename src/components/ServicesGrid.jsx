@@ -9,11 +9,11 @@ import {
   UserCheck,
 } from 'lucide-react';
 import Reveal from '@/components/Reveal';
-import { Image } from '@/components/ui/image';
 import { SERVICES } from '@/data/site';
 
 const ICONS = { Building2, Store, Home, Trees, Key, UserCheck, PartyPopper, Briefcase };
 
+/** @param {{ limit?: number, tone?: string }} props */
 export default function ServicesGrid({ limit, tone = 'light' }) {
   const list = limit ? SERVICES.slice(0, limit) : SERVICES;
   const dark = tone === 'dark';
@@ -31,20 +31,15 @@ export default function ServicesGrid({ limit, tone = 'light' }) {
                   : 'border-border bg-card hover:border-primary/30 hover:shadow-xl'
               }`}
             >
-              <div className="relative aspect-[16/10] overflow-hidden">
-                <Image
-                  src={service.image}
-                  alt={service.title}
-                  className="h-full w-full transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-navy/75 via-navy/15 to-transparent" />
-                <span className="absolute bottom-3 left-3 flex h-11 w-11 items-center justify-center rounded-xl bg-navy/85 text-accent backdrop-blur">
+              <div className="flex flex-1 flex-col p-6">
+                <span
+                  className={`flex h-11 w-11 items-center justify-center rounded-xl ${
+                    dark ? 'bg-white/10 text-accent' : 'bg-primary/8 text-primary'
+                  }`}
+                >
                   <Icon className="h-5 w-5" />
                 </span>
-              </div>
-
-              <div className="flex flex-1 flex-col p-6">
-                <h3 className={`font-heading text-lg font-semibold ${dark ? 'text-white' : 'text-navy'}`}>
+                <h3 className={`mt-4 font-heading text-lg font-semibold ${dark ? 'text-white' : 'text-navy'}`}>
                   {service.title}
                 </h3>
                 <p className={`mt-2.5 text-sm leading-relaxed ${dark ? 'text-white/65' : 'text-muted-foreground'}`}>

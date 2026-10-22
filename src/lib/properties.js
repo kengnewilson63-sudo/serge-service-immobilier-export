@@ -1,4 +1,4 @@
-import { base44 } from '@/api/base44Client';
+import { absoluteFileUrl, base44 } from '@/api/base44Client';
 import { formatPrice } from '@/data/site';
 
 const PRICE_SUFFIX = { location: ' / mois', evenement: ' / jour', vente: '' };
@@ -7,11 +7,23 @@ const PRICE_SUFFIX = { location: ' / mois', evenement: ' / jour', vente: '' };
 export const priceLabelFor = (p) => `${formatPrice(p.price)}${PRICE_SUFFIX[p.transaction] ?? ''}`;
 
 /**
- * Les annonces vivent en base. Le champ `slug` sert d'identifiant public :
- * on l'expose comme `id` pour que les adresses /biens/<slug> restent valables,
- * et `recordId` conserve l'identifiant réel de l'enregistrement.
+ * Les annonces vivent en base. `id` reste l'identifiant réel de l'enregistrement
+ * (utilisé par l'admin pour modifier/supprimer), et `slug` sert d'identifiant
+ * public (adresses /biens/<slug>). Avant, `id` était remplacé par le slug : un
+ * bien modifié depuis l'admin était alors renvoyé au serveur sous son slug et la
+ * requête PUT échouait (404), ce qui faisait croire que la publication s'était perdue.
  */
-export const toProperty = (r) => ({ ...r, recordId: r.id, id: r.slug, priceLabel: priceLabelFor(r) });
+export const toProperty = (r) => ({
+  ...r,
+  recordId: r.id,
+  images: Array.isArray(r.images)
+    ? r.images
+        .filter((s) => typeof s === 'string' && s)
+        .map((url) => (/^\/uploads\//.test(url) ? absoluteFileUrl(url) : url))
+    : [],
+  features: Array.isArray(r.features) ? r.features : [],
+  priceLabel: priceLabelFor(r),
+});
 
 export const CARD_FIELDS = [
   'slug',
@@ -62,7 +74,7 @@ export const buildQuery = (f = {}) => {
   return q;
 };
 
-export const fetchProperties = async (filters = {}, { limit = PAGE_SIZE, cursor } = {}) => {
+export const fetchProperties = async (filters = {}, { limit = PAGE_SIZE, cursor } = /** @type {{ limit?: number, cursor?: any }} */ ({})) => {
   const page = await base44.entities.Property.filter(buildQuery(filters), {
     sort: 'position',
     limit,
@@ -97,26 +109,30 @@ export const fetchRelated = async (property, limit = 3) => {
 
 /** Quartiers les plus fournis (comptage côté serveur) + une photo de chacun. */
 export const fetchNeighborhoodStats = async (limit = 6) => {
-  const { rows } = await base44.entities.Property.aggregate({
+  const { rows } = /** @type {any} */ (await base44.entities.Property.aggregate({
     query: { status: 'disponible' },
     groupBy: 'neighborhood',
     sort: '-count',
     limit,
-  });
+  }));
   if (!rows?.length) return [];
 
-  const names = rows.map((r) => r.neighborhood);
+  const names = rows.map((/** @type {any} */ r) => r.neighborhood);
   const { items } = await base44.entities.Property.filter(
     { status: 'disponible', neighborhood: { $in: names } },
     { fields: ['neighborhood', 'images'], limit: 200 }
   );
 
+  /** @type {Record<string, any>} */
   const imageByName = {};
   items.forEach((r) => {
-    if (!imageByName[r.neighborhood] && r.images?.[0]) imageByName[r.neighborhood] = r.images[0];
+    const first = r.images?.[0];
+    if (!imageByName[r.neighborhood] && first) {
+      imageByName[r.neighborhood] = /^\/uploads\//.test(first) ? absoluteFileUrl(first) : first;
+    }
   });
 
-  return rows.map((r) => ({ name: r.neighborhood, count: r.count, image: imageByName[r.neighborhood] }));
+  return rows.map((/** @type {any} */ r) => ({ name: r.neighborhood, count: r.count, image: imageByName[r.neighborhood] }));
 };
 
 /** Chiffres du bandeau de confiance : biens disponibles et quartiers couverts. */

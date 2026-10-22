@@ -1,36 +1,61 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, Loader2, LogOut, Pencil, Plus, ShieldAlert, Trash2 } from 'lucide-react';
+import { ExternalLink, Loader2, Lock, LogIn, LogOut, Pencil, Plus, ShieldAlert, Trash2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
+import { isAdminUser } from '@/lib/user-role';
 import { Button } from '@/components/ui/button';
 import PropertyForm from '@/components/admin/PropertyForm';
+import SeoTools from '@/components/admin/SeoTools';
+import UsersPanel from '@/components/admin/UsersPanel';
 import { formatPrice } from '@/data/site';
 
 const STATUS_LABEL = { disponible: 'Disponible', prise: 'Déjà prise', vendu: 'Vendu' };
 const TRANSACTION_LABEL = { location: 'À louer', vente: 'À vendre', evenement: 'Événementiel' };
 
 export default function Admin() {
-  const { user, logout } = useAuth();
+  const { user, logout, navigateToLogin } = useAuth();
   const [records, setRecords] = useState([]);
+  const [allRecords, setAllRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [busyId, setBusyId] = useState(null);
 
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = isAdminUser(user);
 
   const load = async () => {
     setLoading(true);
-    const { items } = await base44.entities.Property.filter({}, { sort: '-created_date', limit: 200 });
-    setRecords(items);
-    setLoading(false);
+    try {
+      const { items } = await base44.entities.Property.filter({}, { sort: '-created_date', limit: 200 });
+      setRecords(items ?? []);
+      // Toutes les annonces (y compris celles en cours de chargement) pour le sitemap SEO.
+      setAllRecords(items ?? []);
+    } catch (err) {
+      console.error('Chargement des annonces impossible:', err);
+      setRecords([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     if (isAdmin) load();
   }, [isAdmin]);
 
-  if (!user) return null;
+  if (!user) {
+    return (
+      <section className="container-x flex flex-col items-center py-28 text-center">
+        <Lock className="h-10 w-10 text-primary" />
+        <h1 className="mt-4 font-heading text-2xl font-bold text-navy">Espace réservé à l'agence</h1>
+        <p className="mt-3 max-w-lg text-sm text-muted-foreground">
+          Connectez-vous avec le compte administrateur de l'agence pour gérer les annonces.
+        </p>
+        <Button className="mt-6 bg-primary text-primary-foreground hover:bg-primary/90" onClick={navigateToLogin}>
+          <LogIn className="mr-2 h-4 w-4" /> Se connecter
+        </Button>
+      </section>
+    );
+  }
 
   if (!isAdmin) {
     return (
@@ -38,9 +63,14 @@ export default function Admin() {
         <ShieldAlert className="h-10 w-10 text-primary" />
         <h1 className="mt-4 font-heading text-2xl font-bold text-navy">Espace réservé à l'agence</h1>
         <p className="mt-3 max-w-lg text-sm text-muted-foreground">
-          Vous êtes connecté avec <span className="font-medium text-navy">{user.email}</span>, mais ce compte n'a pas
-          encore les droits d'administration. Demandez à ce que ce compte soit passé en « administrateur », puis
-          rechargez cette page.
+          Vous êtes connecté avec <span className="font-medium text-navy">{user.email || user.full_name}</span>, mais ce
+          compte n'a pas encore les droits d'administration. Demandez à ce que ce compte soit passé en « administrateur »,
+          puis rechargez cette page.
+        </p>
+        <p className="mt-4 max-w-lg rounded-xl border border-dashed border-border bg-card px-4 py-3 text-xs text-muted-foreground">
+          En local (<code>base44 dev</code>), les données et les comptes sont en mémoire : les rôles de votre app
+          hébergée ne s'appliquent pas. Utilisez <code>base44 dev --remote</code> pour vous connecter avec le vrai compte
+          administrateur.
         </p>
         <Button variant="outline" className="mt-6" onClick={() => logout(true)}>
           <LogOut className="mr-2 h-4 w-4" /> Se déconnecter
@@ -52,9 +82,17 @@ export default function Admin() {
   const handleDelete = async (record) => {
     if (!window.confirm(`Supprimer définitivement « ${record.title} » ?`)) return;
     setBusyId(record.id);
-    await base44.entities.Property.delete(record.id);
-    setRecords((prev) => prev.filter((r) => r.id !== record.id));
-    setBusyId(null);
+    try {
+      await base44.entities.Property.delete(record.id);
+      setRecords((prev) => prev.filter((r) => r.id !== record.id));
+    } catch (err) {
+      console.error('Suppression impossible:', err);
+      window.alert(
+        err?.data?.message || err?.response?.data?.message || err?.message || 'La suppression a échoué.'
+      );
+    } finally {
+      setBusyId(null);
+    }
   };
 
   const handleSaved = () => {
@@ -64,6 +102,8 @@ export default function Admin() {
 
   return (
     <section className="bg-secondary/40 py-10 sm:py-14">
+      <SeoTools records={allRecords} />
+      <UsersPanel />
       <div className="container-x">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -89,6 +129,7 @@ export default function Admin() {
         {editing && (
           <div className="mt-8">
             <PropertyForm
+              key={editing === 'new' ? 'new' : editing.id}
               record={editing === 'new' ? null : editing}
               onSaved={handleSaved}
               onCancel={() => setEditing(null)}

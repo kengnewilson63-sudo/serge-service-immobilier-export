@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Bath, BedDouble, MapPin, Maximize } from 'lucide-react';
 import { Image } from '@/components/ui/image';
-import { formatPrice } from '@/data/site';
+import { IMAGES, formatPrice } from '@/data/site';
 
 const TRANSACTION_LABEL = { location: 'À louer', vente: 'À vendre', evenement: 'Événementiel' };
 const STATUS_LABEL = { prise: 'Déjà prise', vendu: 'Vendu' };
@@ -12,10 +12,10 @@ export default function PropertyCard({ property }) {
     <Link
       to={`/biens/${property.id}`}
       className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl">
-      
+
       <div className="relative aspect-[4/3] overflow-hidden">
         <Image
-          src={property.images?.[0] || 'https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/54382dcd0_WhatsApp_Image_2026-10-02_at_173426__2_.jpeg'}
+          src={property.images?.[0] || IMAGES.fallback}
           alt={`${property.title} — ${TRANSACTION_LABEL[property.transaction]} à ${property.neighborhood}, Douala`}
           className="h-full w-full transition-transform duration-700 group-hover:scale-105"
         />

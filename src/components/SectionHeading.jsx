@@ -1,3 +1,6 @@
+/**
+ * @param {{ eyebrow?: string, title?: string, subtitle?: string, align?: 'left'|'center', tone?: 'light'|'dark' }} props
+ */
 export default function SectionHeading({ eyebrow, title, subtitle, align = 'left', tone = 'light' }) {
   const centered = align === 'center';
   const dark = tone === 'dark';

@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
 import { CheckCircle2, MapPin } from 'lucide-react';
 import HeroSearch from '@/components/home/HeroSearch';
-import { SITE } from '@/data/site';
+import { IMAGES, SITE } from '@/data/site';
 
-const BG = 'https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/e6a16752c_generated_image.png';
+const BG = IMAGES.hero;
 
 export default function Hero() {
   return (

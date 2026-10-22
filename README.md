@@ -1,62 +1,96 @@
-# Base44 Project
+# Serge Service Immobilier
 
-Use this repository to run and edit the app locally, then publish changes back through Base44.
+Application composée de deux parties :
 
-Any change pushed to the repo will also be reflected in the Base44 Builder.
+| Partie | Techno | Dossier | Port |
+| --- | --- | --- | --- |
+| Frontend | React + Vite | `src/` | 5173 |
+| Backend | Spring Boot + PostgreSQL | `backend/` | 8080 |
 
-## Prerequisites
+> Le backend n'est **pas** celui de Base44 : c'est un serveur Java autonome. `base44 dev`
+> ne le lance pas — utilisez les commandes ci-dessous.
 
-1. Clone the repository using the project's Git URL.
-2. Navigate to the project directory.
-3. Install dependencies: `npm install`.
-4. Install the Base44 CLI: `npm install -g base44@latest`.
-5. Install [Deno](https://docs.deno.com/runtime/getting_started/installation/) — the local Base44 backend runs on it.
+## Prérequis
 
-Run `base44 --help` (or see the [CLI reference](https://docs.base44.com/developers/references/cli/commands/introduction)) for the full command surface.
+- Node.js 20+ et npm
+- Java 21 et Maven
+- Docker Desktop (pour la base PostgreSQL)
 
-## Run Locally
+## Lancer le projet
 
-Three commands, from the project root:
+Guide complet (local, serveur, domaine, HTTPS, sauvegardes, SEO) : **[DEPLOIEMENT.md](DEPLOIEMENT.md)**.
 
-```bash
-base44 login   # one-time per machine
-base44 link    # one-time per clone
-base44 dev     # local backend + frontend together
-```
+### Version la plus simple — tout sur un seul port
 
-Open the frontend URL that `base44 dev` prints (typically `http://localhost:5173`).
-
-Notes:
-
-- **Every fresh clone needs `base44 link`.** It writes `base44/.app.jsonc` (the app-id pointer), which is deliberately gitignored. Your app id is in the Builder URL (`app.base44.com/apps/<id>/...`); `base44 link --help` shows the non-interactive flags.
-- **`base44 dev` runs the frontend for you** (via `site.serveCommand` in this repo's `base44/config.jsonc`) — never run `npm run dev` yourself: alone it serves a UI with no backend behind it (`[base44] Proxy not enabled`, every `/api` call fails), and alongside `base44 dev` the second Vite silently takes the next port and you end up looking at the wrong one.
-- **The app must be published at least once for the UI to load under `base44 dev`.** The frontend boots by fetching app settings from the hosted app; before the first publish that fails and every page redirects to login. The local API works regardless.
-- Entities, functions, and auth run locally — entity data is **in-memory only**, wiped when `base44 dev` restarts. Everything else (Core integrations, OAuth login) is forwarded to your deployed app. Full breakdown: [Local development overview](https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview).
-
-## Frontend Only, Hosted Backend
-
-To work on just the frontend against your app's live hosted backend:
+Le backend sert le site, l'API et les photos : une fois le site compilé, il n'y a
+plus qu'un seul serveur à lancer.
 
 ```bash
-base44 dev --remote
+docker compose up -d                    # PostgreSQL (port 5433)
+npm install && npm run build            # compile le site
+rm -rf backend/frontend && cp -R dist backend/frontend
+cd backend && mvn spring-boot:run       # site + API sur http://localhost:8080
 ```
 
-⚠️ In this mode writes go to your app's **production data** — plain `base44 dev` keeps everything local.
+- Site : http://localhost:8080
+- **Administration : http://localhost:8080/admin**
+- Photos : servies sous `/uploads/…`
+- SEO : `/sitemap.xml` et `/robots.txt`
 
-## Publish Your Changes
-
-After pushing your changes to git, open the Base44 dashboard and publish the app:
+### Développement avec rechargement à chaud
 
 ```bash
-base44 dashboard open
+docker compose up -d                    # PostgreSQL
+cd backend && mvn spring-boot:run       # backend sur :8080
+npm run dev                             # frontend sur :5173
 ```
 
-This repo syncs to Base44 through git, so publish from the dashboard rather than `base44 deploy` — a CLI deploy ships your local tree directly, bypassing the sync, and the deployed state silently diverges from the repo.
+Connexion admin : `ADMIN_EMAIL` / `ADMIN_PASSWORD` de `backend/.env`
+(valeurs par défaut : `admin@serge-immobilier.com` / `changez-ce-mot-de-passe`).
+Le compte est créé au premier démarrage uniquement.
 
-## Docs & Support
+## API
 
-GitHub integration: [https://docs.base44.com/developers/app-code/local-development/github](https://docs.base44.com/developers/app-code/local-development/github)
+| Méthode | Route | Accès |
+| --- | --- | --- |
+| `GET` | `/api/properties` | public |
+| `GET` | `/api/properties/{slug}` | public |
+| `POST` | `/api/properties` | admin (JWT) |
+| `PUT` | `/api/properties/{id}` | admin (JWT) |
+| `DELETE` | `/api/properties/{id}` | admin (JWT) |
+| `POST` | `/api/auth/login` | public |
+| `POST` | `/api/auth/register` | public |
+| `POST` | `/api/auth/password-reset-request` | public |
+| `POST` | `/api/auth/password-reset` | public |
+| `POST` | `/api/uploads` | admin (JWT) |
+| `GET` | `/uploads/{fichier}` | public |
+| `GET` | `/api/auth/me` | connecté |
 
-Local development: [https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview](https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview)
+### Photos
 
-Support: [https://app.base44.com/support](https://app.base44.com/support)
+L'upload est géré par le backend : la photo est écrite dans `backend/uploads/` (10 Mo max,
+JPEG/PNG/WEBP/GIF) et servie sous `/uploads/<fichier>`.
+
+### Base de données
+
+Le schéma est versionné par **Flyway** (`backend/src/main/resources/db/migration/`).
+`ddl-auto: validate` : Hibernate vérifie le schéma mais ne le modifie pas. Pour une nouvelle
+migration, ajoutez `V2__ma_modification.sql` — elle sera appliquée au démarrage.
+
+### Mot de passe oublié
+
+Renseignez `SMTP_*` pour un envoi réel. Sans SMTP, le lien est renvoyé dans `devResetUrl`
+et affiché dans la page — uniquement si `MAIL_EXPOSE_RESET_LINK=true` (développement).
+
+## Vérifications
+
+```bash
+npm run lint            # frontend
+npm run typecheck       # frontend (types JSDoc)
+cd backend && mvn test  # backend (nécessite Docker : PostgreSQL éphémère)
+```
+
+## Liens Base44
+
+- Agent skills : https://docs.base44.com/developers/backend/overview/skills.md
+- Support : https://app.base44.com/support

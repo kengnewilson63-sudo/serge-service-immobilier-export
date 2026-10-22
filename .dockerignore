@@ -1,0 +1,36 @@
+# Fichiers exclus du contexte de build Docker (envoyé à Render / au serveur).
+# Sans ce fichier, ~460 Mo sont transférés à chaque build et les dépendances
+# locales de la machine (macOS) peuvent casser la compilation dans le conteneur Linux.
+
+# Dépendances et builds locaux : réinstallés/compilés proprement dans l'image.
+node_modules
+dist
+dist-ssr
+# Compilation Maven locale et copie du site compilé : les deux sont recréés
+# dans l'image. Sans ces deux lignes, ~55 Mo inutiles partent à chaque build.
+backend/target
+backend/frontend
+
+# Secrets : jamais dans l'image. Ils passent par les variables d'environnement.
+.env
+.env.*
+!.env.example
+!.env.production.example
+backend/.env
+
+# Base locale, photos uploadées : ce sont des données, pas du code.
+backend/uploads
+
+# Divers
+.git
+.gitignore
+npm-debug.log*
+*.log
+logs
+README.md
+DEPLOIEMENT.md
+AGENTS.md
+CLAUDE.md
+docker-compose.yml
+docker-compose.prod.yml
+Users

@@ -18,7 +18,8 @@ const FALLBACK_IMAGE_URL =
  * as a plain <img>. Failed transforms retry the original URL; only a broken
  * original swaps to the generic fallback image.
  */
-const Image = React.forwardRef(
+/** @typedef {React.ComponentPropsWithoutRef<'img'> & { src?: string, fittingType?: string, originWidth?: number, originHeight?: number, focalPointX?: number, focalPointY?: number, quality?: number, onError?: (event: any) => void }} ImageProps */
+const Image = /** @type {React.ForwardRefExoticComponent<ImageProps & React.RefAttributes<any>>} */ (React.forwardRef(
   (
     {
       src: source,
@@ -105,7 +106,7 @@ const Image = React.forwardRef(
       />
     )
   }
-)
+))
 Image.displayName = "Image"
 
 export { Image }

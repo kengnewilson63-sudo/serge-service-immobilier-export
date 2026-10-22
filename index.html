@@ -4,61 +4,61 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Serge Service Immobilier — Location &amp; vente immobilière à Douala</title>
+    <title>Agence immobilière à Cité des Palmiers, Douala — Serge Service Immobilier</title>
     <meta
       name="description"
-      content="Serge Service Immobilier (S.S.I) : appartements, studios et chambres meublées à louer, maisons, villas et terrains à vendre à Douala. Makepe, Logpom, Bonamoussadi, Kotto, Logbessou, Bonabéri, Yassa. Visite organisée et contact direct WhatsApp."
+      content="Agence immobilière à la Cité des Palmiers, Douala : appartements, studios et chambres meublées à louer, maisons, villas et terrains à vendre. Makepe, Logpom, Bonamoussadi, Kotto, Logbessou, Bonabéri, Yassa. Visite organisée et contact direct WhatsApp."
     />
     <meta
       name="keywords"
-      content="immobilier Douala, appartement à louer Douala, appartement Douala, studio meublé Douala, chambre meublée Douala, terrain à vendre Douala, maison à vendre Douala, villa Douala, duplex à louer Douala, local commercial Douala, salle des fêtes Douala, agence immobilière Douala, location Cameroun, Makepe, Logpom, Bonamoussadi, Kotto, Logbessou, Bonabéri, Yassa, Akwa, Bonapriso, Ndogpassi"
+      content="agence immobilière Cité des Palmiers, agence immobilière Douala, immobilier Douala, appartement à louer Cité des Palmiers, appartement à louer Douala, studio meublé Douala, chambre meublée Douala, terrain à vendre Douala, maison à vendre Douala, villa Douala, duplex à louer Douala, local commercial Douala, salle des fêtes Douala, location Cameroun, Makepe, Logpom, Bonamoussadi, Kotto, Logbessou, Bonabéri, Yassa, Akwa, Bonapriso"
     />
     <meta name="author" content="Serge Service Immobilier" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta name="googlebot" content="index, follow" />
+    <!-- Remplie automatiquement par le serveur avec GOOGLE_SITE_VERIFICATION (backend/.env) ;
+         retirée si le code n'est pas configuré, pour ne pas annoncer une balise vide à Google. -->
+    <script>
+      (function () {
+        var code = '%GOOGLE_SITE_VERIFICATION%';
+        var tag = document.querySelector('meta[name="google-site-verification"]');
+        if (!tag) return;
+        if (!code || code.indexOf('%') === 0) tag.remove();
+        else tag.setAttribute('content', code);
+      })();
+    </script>
     <meta name="theme-color" content="#0056B3" />
 
-    <link rel="canonical" href="https://serge-home-flow.base44.app/" />
-    <link
-      rel="icon"
-      type="image/jpeg"
-      href="https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/cb1abc266_WhatsAppImage2026-10-02at171404.jpeg"
-    />
-    <link
-      rel="apple-touch-icon"
-      href="https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/cb1abc266_WhatsAppImage2026-10-02at171404.jpeg"
-    />
+    <!-- Le canonical par page est posé par React (composant Seo) ; cette balise est
+         la valeur de la page d'accueil, pour les robots qui n'exécutent pas le JS. -->
+    <link rel="canonical" href="%SITE_URL%/" data-site-url />
+    <link rel="icon" type="image/jpeg" href="/images/logo.jpg" />
+    <link rel="apple-touch-icon" href="/images/logo.jpg" />
     <link rel="manifest" href="/manifest.json" />
 
     <!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Serge Service Immobilier" />
     <meta property="og:locale" content="fr_CM" />
-    <meta property="og:title" content="Serge Service Immobilier — Location &amp; vente immobilière à Douala" />
+    <meta property="og:title" content="Agence immobilière à Cité des Palmiers, Douala — Serge Service Immobilier" />
     <meta
       property="og:description"
       content="Appartements, studios et chambres meublées à louer, maisons, villas et terrains à vendre à Douala. Visite organisée et contact direct WhatsApp."
     />
-    <meta property="og:url" content="https://serge-home-flow.base44.app/" />
-    <meta
-      property="og:image"
-      content="https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/e6a16752c_generated_image.png"
-    />
+    <meta property="og:url" content="%SITE_URL%/" data-site-url />
+    <meta property="og:image" content="%SITE_URL%/images/hero.jpg" data-site-url />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Appartement moderne à louer à Douala — Serge Service Immobilier" />
 
     <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Serge Service Immobilier — Location &amp; vente immobilière à Douala" />
+    <meta name="twitter:title" content="Agence immobilière à Cité des Palmiers, Douala — Serge Service Immobilier" />
     <meta
       name="twitter:description"
       content="Appartements, studios, chambres meublées, maisons, villas et terrains à Douala. Contact direct WhatsApp."
     />
-    <meta
-      name="twitter:image"
-      content="https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/e6a16752c_generated_image.png"
-    />
+    <meta name="twitter:image" content="%SITE_URL%/images/hero.jpg" data-site-url />
 
     <!-- Localisation (référencement local Douala) -->
     <meta name="geo.region" content="CM-LT" />
@@ -70,27 +70,38 @@
       {
         "@context": "https://schema.org",
         "@type": "RealEstateAgent",
-        "@id": "https://serge-home-flow.base44.app/#agence",
+        "@id": "%SITE_URL%/#agence",
         "name": "Serge Service Immobilier",
-        "alternateName": "S.S.I",
-        "description": "Agence immobilière à Douala : location d'appartements, studios et chambres meublées, vente de maisons, villas et terrains, gestion immobilière et location événementielle.",
-        "url": "https://serge-home-flow.base44.app/",
-        "image": "https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/cb1abc266_WhatsAppImage2026-10-02at171404.jpeg",
+        "alternateName": "S.S.I — Agence immobilière Cité des Palmiers",
+        "description": "Agence immobilière à la Cité des Palmiers, Douala : location d'appartements, studios et chambres meublées, vente de maisons, villas et terrains, gestion immobilière et location événementielle.",
+        "url": "%SITE_URL%/",
+        "image": "%SITE_URL%/images/logo.jpg",
+        "logo": "%SITE_URL%/images/logo.jpg",
         "telephone": ["+237681284514", "+237695929001"],
-        "email": "contact@sergeserviceimmo.cm",
+        "email": "youmbiserges9@gmail.com",
         "priceRange": "55000 - 250000000 XAF",
         "currenciesAccepted": "XAF",
         "address": {
           "@type": "PostalAddress",
           "streetAddress": "Cité des Palmiers, derrière le lycée",
-          "addressLocality": "Douala",
+          "addressLocality": "Cité des Palmiers",
           "addressRegion": "Littoral",
           "addressCountry": "CM"
         },
         "geo": { "@type": "GeoCoordinates", "latitude": 4.0511, "longitude": 9.7679 },
+        "hasMap": "https://www.google.com/maps/search/agence+immobili%C3%A8re+cit%C3%A9+des+palmiers+douala",
         "areaServed": [
+          { "@type": "Place", "name": "Cité des Palmiers, Douala" },
           { "@type": "City", "name": "Douala" },
           { "@type": "AdministrativeArea", "name": "Littoral" }
+        ],
+        "knowsAbout": [
+          "agence immobilière",
+          "location d'appartements",
+          "vente de terrains",
+          "vente de maisons",
+          "gestion immobilière",
+          "Cité des Palmiers Douala"
         ],
         "knowsLanguage": ["fr", "en"],
         "openingHoursSpecification": [
@@ -108,20 +119,37 @@
       {
         "@context": "https://schema.org",
         "@type": "WebSite",
-        "@id": "https://serge-home-flow.base44.app/#website",
+        "@id": "%SITE_URL%/#website",
         "name": "Serge Service Immobilier",
-        "url": "https://serge-home-flow.base44.app/",
+        "url": "%SITE_URL%/",
         "inLanguage": "fr",
-        "publisher": { "@id": "https://serge-home-flow.base44.app/#agence" },
+        "publisher": { "@id": "%SITE_URL%/#agence" },
         "potentialAction": {
           "@type": "SearchAction",
           "target": {
             "@type": "EntryPoint",
-            "urlTemplate": "https://serge-home-flow.base44.app/biens?q={search_term_string}"
+            "urlTemplate": "%SITE_URL%/biens?q={search_term_string}"
           },
           "query-input": "required name=search_term_string"
         }
       }
+    </script>
+
+    <script>
+      // Remplace %SITE_URL% par l'URL publique du site. %VITE_SITE_URL% est
+      // remplacé au build (Vite) ; sinon on prend l'origine réelle de la page.
+      // Placé après les balises concernées : elles existent déjà à l'exécution.
+      (function () {
+        var origin = '%VITE_SITE_URL%';
+        if (!origin || origin.indexOf('VITE_SITE_URL') !== -1) origin = window.location.origin;
+        origin = origin.replace(/\/+$/, '');
+        document.querySelectorAll('[data-site-url]').forEach(function (el) {
+          el.setAttribute('content', el.getAttribute('content').replace(/%SITE_URL%/g, origin));
+        });
+        document.querySelectorAll('script[type="application/ld+json"]').forEach(function (el) {
+          el.text = el.text.replace(/%SITE_URL%/g, origin);
+        });
+      })();
     </script>
   </head>
   <body>

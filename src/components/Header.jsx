@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { LayoutDashboard, Menu, MessageCircle, Phone, X } from 'lucide-react';
+import { LayoutDashboard, LogOut, Menu, MessageCircle, Phone, X } from 'lucide-react';
 import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/AuthContext';
@@ -11,8 +11,10 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { pathname } = useLocation();
-  const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  const { user, logout } = useAuth();
+  // L'entrée « Espace agence » est publique : /admin affiche un écran de connexion
+  // quand personne n'est connecté. Avant, le lien n'apparaissait que si un
+  // administrateur était déjà connecté — donc jamais au premier passage.
 
   useEffect(() => setOpen(false), [pathname]);
 
@@ -58,14 +60,22 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-          {isAdmin && (
-            <Link
-              to="/admin"
-              className="hidden items-center gap-2 rounded-lg border border-primary/25 px-3.5 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/5 sm:inline-flex"
+          <Link
+            to="/admin"
+            className="hidden items-center gap-2 rounded-lg border border-primary/25 px-3.5 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/5 sm:inline-flex"
+          >
+            <LayoutDashboard className="h-4 w-4" />
+            Espace agence
+          </Link>
+          {user && (
+            <button
+              type="button"
+              onClick={() => logout(true)}
+              className="hidden items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary sm:inline-flex"
             >
-              <LayoutDashboard className="h-4 w-4" />
-              Espace agence
-            </Link>
+              <LogOut className="h-4 w-4" />
+              Déconnexion
+            </button>
           )}
           <a
             href={telLink(PRIMARY.tel)}
@@ -116,13 +126,20 @@ export default function Header() {
                 </NavLink>
               ))}
               <div className="mt-3 flex flex-col gap-3 border-t border-border pt-5">
-                {isAdmin && (
-                  <Link
-                    to="/admin"
-                    className="flex items-center gap-2 rounded-lg border border-primary/25 px-4 py-3 text-base font-semibold text-primary"
+                <Link
+                  to="/admin"
+                  className="flex items-center gap-2 rounded-lg border border-primary/25 px-4 py-3 text-base font-semibold text-primary"
+                >
+                  <LayoutDashboard className="h-4 w-4" /> Espace agence
+                </Link>
+                {user && (
+                  <button
+                    type="button"
+                    onClick={() => logout(true)}
+                    className="flex items-center gap-2 rounded-lg px-4 py-3 text-base font-medium text-muted-foreground"
                   >
-                    <LayoutDashboard className="h-4 w-4" /> Espace agence
-                  </Link>
+                    <LogOut className="h-4 w-4" /> Déconnexion
+                  </button>
                 )}
                 <Button asChild className="bg-[#25D366] text-white hover:bg-[#1da851]">
                   <a href={waLink('Bonjour Serge Service Immobilier, je souhaiterais des informations.')} target="_blank" rel="noopener noreferrer">

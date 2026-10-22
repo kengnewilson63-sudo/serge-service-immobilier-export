@@ -5,12 +5,7 @@ import SectionHeading from '@/components/SectionHeading';
 import CtaBand from '@/components/home/CtaBand';
 import Seo from '@/components/Seo';
 import { ABOUT_JSON_LD, OG_IMAGE, breadcrumbJsonLd } from '@/lib/seo';
-import { Image } from '@/components/ui/image';
-import { useEffect, useState } from 'react';
 import { CONTACT, SITE } from '@/data/site';
-import { fetchCatalogStats } from '@/lib/properties';
-
-const IMG = 'https://media.base44.com/images/public/6abf782998bb3e8f408ffb22/40c7f9b98_generated_image.png';
 
 const VALUES = [
   { icon: ShieldCheck, title: 'Confiance', desc: "Des biens visités et des informations vérifiées avant toute publication." },
@@ -20,18 +15,12 @@ const VALUES = [
 ];
 
 export default function About() {
-  const [neighborhoods, setNeighborhoods] = useState(null);
-
-  useEffect(() => {
-    fetchCatalogStats().then((stats) => setNeighborhoods(stats.neighborhoods));
-  }, []);
-
   return (
     <>
       <Seo
-        title="À propos — Agence immobilière à Douala | Serge Service Immobilier"
-        description="Serge Service Immobilier (S.S.I) est une agence immobilière basée à Douala, spécialisée dans la location, la vente et la gestion de biens à Makepe, Logpom, Bonamoussadi, Kotto et dans tout le Littoral."
-        keywords="agence immobilière Douala, Serge Service Immobilier, S.S.I, agence immobilière Cameroun, courtier immobilier Douala, agence immobilière Littoral"
+        title="À propos — Agence immobilière Cité des Palmiers, Douala | Serge Service Immobilier"
+        description="Serge Service Immobilier (S.S.I) est une agence immobilière basée à la Cité des Palmiers, Douala, spécialisée dans la location, la vente et la gestion de biens à Makepe, Logpom, Bonamoussadi, Kotto et dans tout le Littoral."
+        keywords="agence immobilière Cité des Palmiers, agence immobilière Douala, Serge Service Immobilier, S.S.I, agence immobilière Cameroun, courtier immobilier Douala, agence immobilière Littoral"
         image={OG_IMAGE.apropos}
         path="/a-propos"
         jsonLd={[
@@ -50,27 +39,12 @@ export default function About() {
       />
 
       <section className="py-20 sm:py-24">
-        <div className="container-x grid items-center gap-14 lg:grid-cols-2">
-          <Reveal>
-            <div className="relative">
-              <div className="overflow-hidden rounded-3xl">
-                <Image src={IMG} alt="Serge Service Immobilier à Douala" className="aspect-[4/3] w-full" />
-              </div>
-              <div className="absolute -bottom-6 -right-4 hidden rounded-2xl border border-border bg-card p-6 shadow-xl sm:block">
-                <p className="font-heading text-3xl font-extrabold text-primary">{neighborhoods ?? '—'}</p>
-                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Quartiers couverts
-                </p>
-              </div>
-            </div>
-          </Reveal>
-
-          <Reveal delay={0.1}>
-            <SectionHeading
-              eyebrow="Notre histoire"
-              title="Une agence locale, au service des habitants de Douala"
-            />
-            <div className="mt-6 space-y-4 text-base leading-relaxed text-muted-foreground">
+        <div className="container-x">
+          <SectionHeading
+            eyebrow="Notre histoire"
+            title="Une agence locale, au service des habitants de Douala"
+          />
+          <div className="mt-6 grid max-w-3xl gap-4 text-base leading-relaxed text-muted-foreground">
               <p>
                 Basée à Douala, <strong className="text-navy">Serge Service Immobilier</strong> accompagne les
                 particuliers et les familles dans la recherche d'un logement : appartements, studios et
@@ -86,7 +60,6 @@ export default function About() {
                 bien d'autres — nous permet de vous proposer des biens au plus près de vos besoins.
               </p>
             </div>
-          </Reveal>
         </div>
       </section>
 

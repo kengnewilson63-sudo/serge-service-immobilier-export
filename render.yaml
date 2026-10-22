@@ -1,0 +1,64 @@
+# Déploiement Render — Serge Service Immobilier
+#
+# RENDER : https://dashboard.render.com → « New » → « Blueprint » → choisir ce dépôt.
+# Render lit ce fichier, crée le service et demande les variables secrètes.
+#
+# La base PostgreSQL vit sur Neon (gratuit, permanente) et NON sur Render :
+# la base gratuite de Render est supprimée au bout de 30 jours.
+# Créez-la d'abord sur https://neon.tech (voir DEPLOIEMENT.md § 3).
+
+services:
+  - type: web
+    name: serge-service-immobilier
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    # Frankfurt : le plus proche du Cameroun parmi les régions gratuites.
+    region: frankfurt
+    plan: free
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /actuator/health
+    envVars:
+      # --- Base de données Neon (à coller depuis la console Neon) ---
+      # Format : jdbc:postgresql://<hote>/<base>?sslmode=require
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+
+      # --- Sécurité (générées / à saisir dans Render) ---
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        value: admin@serge-immobilier.com
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: SETUP_CODE
+        sync: false
+      - key: ALLOW_REGISTRATION
+        value: "false"
+
+      # --- URL du site : Render fournit automatiquement le domaine ---
+      - key: APP_PUBLIC_URL
+        fromService:
+          type: web
+          name: serge-service-immobilier
+          envVarKey: RENDER_EXTERNAL_URL
+
+      # --- Divers ---
+      # Les photos sont dans /app/uploads : en plan gratuit elles sont PERDUES à
+      # chaque redéploiement. Voir la note dans DEPLOIEMENT.md.
+      - key: UPLOAD_DIR
+        value: /app/uploads
+      - key: MAIL_EXPOSE_RESET_LINK
+        value: "false"
+      - key: SMTP_HOST
+        value: ""
+      - key: SMTP_PORT
+        value: "587"
+      - key: MAIL_FROM
+        value: no-reply@sergeserviceimmo.cm
+      - key: GOOGLE_SITE_VERIFICATION
+        value: ""

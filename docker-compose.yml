@@ -1,0 +1,28 @@
+# Base de données PostgreSQL locale pour le backend Spring Boot.
+#   docker compose up -d
+#
+# Le port hôte par défaut est 5433 (et non 5432) pour ne pas entrer en conflit
+# avec un autre PostgreSQL déjà installé sur la machine. Les identifiants et
+# l'URL attendue par le backend se trouvent dans backend/.env (chargé
+# automatiquement par Spring Boot).
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: serge-immobilier-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-serge_immobilier}
+      POSTGRES_USER: ${POSTGRES_USER:-serge}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-serge123}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - serge_immobilier_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-serge} -d ${POSTGRES_DB:-serge_immobilier}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  serge_immobilier_pgdata:
