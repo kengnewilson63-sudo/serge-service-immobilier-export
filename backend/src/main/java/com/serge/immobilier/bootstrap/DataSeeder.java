@@ -41,7 +41,13 @@ public class DataSeeder implements CommandLineRunner {
 
     private boolean isLocalDevelopment() {
         String url = System.getenv("DB_URL");
-        return url == null || url.contains("localhost") || url.contains("127.0.0.1");
+        if (url == null || url.contains("localhost") || url.contains("127.0.0.1")) {
+            return true;
+        }
+        // Render, Railway, Fly.io… : un serveur en ligne n'est jamais « local », même
+        // si le contexte Spring actif n'indique pas encore le profil de production.
+        String render = System.getenv("RENDER");
+        return render == null || render.isBlank();
     }
 
     /** Vrai si le compte administrateur existe déjà (l'agence est en place). */
@@ -66,7 +72,7 @@ public class DataSeeder implements CommandLineRunner {
                             adminEmail, DEFAULT_DEV_PASSWORD);
                 } else {
                     org.slf4j.LoggerFactory.getLogger(DataSeeder.class).warn(
-                            "Aucun compte administrateur : définissez ADMIN_PASSWORD (au moins 8 caractères) dans backend/.env");
+                            "Aucun compte administrateur : définissez ADMIN_PASSWORD (au moins 8 caractères) dans les variables d'environnement du serveur");
                 }
             }
         }
