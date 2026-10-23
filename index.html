@@ -139,15 +139,17 @@
       // Remplace %SITE_URL% par l'URL publique du site. %VITE_SITE_URL% est
       // remplacé au build (Vite) ; sinon on prend l'origine réelle de la page.
       // Placé après les balises concernées : elles existent déjà à l'exécution.
+      // Une balise sans cet attribut faisait planter tout le script (lecture de null).
       (function () {
         var origin = '%VITE_SITE_URL%';
         if (!origin || origin.indexOf('VITE_SITE_URL') !== -1) origin = window.location.origin;
         origin = origin.replace(/\/+$/, '');
         document.querySelectorAll('[data-site-url]').forEach(function (el) {
-          el.setAttribute('content', el.getAttribute('content').replace(/%SITE_URL%/g, origin));
+          var content = el.getAttribute('content');
+          if (content) el.setAttribute('content', content.replace(/%SITE_URL%/g, origin));
         });
         document.querySelectorAll('script[type="application/ld+json"]').forEach(function (el) {
-          el.text = el.text.replace(/%SITE_URL%/g, origin);
+          if (el.text) el.text = el.text.replace(/%SITE_URL%/g, origin);
         });
       })();
     </script>

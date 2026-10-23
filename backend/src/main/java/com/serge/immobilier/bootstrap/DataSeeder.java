@@ -55,8 +55,33 @@ public class DataSeeder implements CommandLineRunner {
         return userRepository.countByRole(Role.ADMIN) > 0;
     }
 
+    /**
+     * Remet le mot de passe de l'administrateur à la valeur d'ADMIN_PASSWORD.
+     * Utilisé uniquement si la variable ADMIN_RESET_PASSWORD=true (oubli du mot de passe
+     * en ligne) : sans ce drapeau, un ADMIN_PASSWORD ancien dans le tableau de bord de
+     * l'hébergeur ne doit jamais écraser un mot de passe changé depuis le site.
+     */
+    private void resetAdminPasswordIfRequested() {
+        if (!"true".equalsIgnoreCase(System.getenv("ADMIN_RESET_PASSWORD"))) return;
+        if (adminPassword == null || adminPassword.isBlank()) return;
+        String email = adminEmail.trim().toLowerCase();
+        UserEntity user = userRepository.findByEmail(email).orElseGet(() -> {
+            UserEntity created = new UserEntity();
+            created.setFullName("Serge Service Immobilier");
+            created.setEmail(email);
+            return created;
+        });
+        user.setPassword(passwordEncoder.encode(adminPassword));
+        user.setRole(Role.ADMIN);
+        userRepository.save(user);
+        org.slf4j.LoggerFactory.getLogger(DataSeeder.class).warn(
+                "ADMIN_RESET_PASSWORD=true : le mot de passe de {} a été réinitialisé depuis ADMIN_PASSWORD. "
+                        + "Repassez ADMIN_RESET_PASSWORD à false après la connexion.", email);
+    }
+
     @Override
     public void run(String... args) {
+        resetAdminPasswordIfRequested();
         // ADMIN_PASSWORD ne sert qu'à la CRÉATION du compte lorsque l'agence n'a encore
         // aucun administrateur. S'il en existe un, c'est son mot de passe qui fait foi :
         // un ADMIN_PASSWORD oublié ou par défaut ne doit jamais écraser le vrai mot de passe.
