@@ -1,4 +1,4 @@
-import { absoluteFileUrl, base44 } from '@/api/base44Client';
+import { absoluteFileUrl, apiClient, base44 } from '@/api/base44Client';
 import { formatPrice } from '@/data/site';
 
 const PRICE_SUFFIX = { location: ' / mois', evenement: ' / jour', vente: '' };
@@ -13,17 +13,30 @@ export const priceLabelFor = (p) => `${formatPrice(p.price)}${PRICE_SUFFIX[p.tra
  * bien modifié depuis l'admin était alors renvoyé au serveur sous son slug et la
  * requête PUT échouait (404), ce qui faisait croire que la publication s'était perdue.
  */
-export const toProperty = (r) => ({
+export const toProperty = (r, { absoluteImages = true } = {}) => ({
   ...r,
   recordId: r.id,
   images: Array.isArray(r.images)
     ? r.images
         .filter((s) => typeof s === 'string' && s)
-        .map((url) => (/^\/uploads\//.test(url) ? absoluteFileUrl(url) : url))
+        .map((url) => (absoluteImages && /^\/uploads\//.test(url) ? absoluteFileUrl(url) : url))
     : [],
   features: Array.isArray(r.features) ? r.features : [],
   priceLabel: priceLabelFor(r),
 });
+
+/**
+ * Lien public d'un bien : `/biens/<slug>`. Le backend sert la page sur SLUG
+ * (`GET /api/properties/{slug}`) et le sitemap référence les slugs. Avant, les
+ * cartes pointaient vers l'ID numérique : le serveur cherchait alors un slug
+ * nommé « 34 » et renvoyait 404, d'où la fiche qui semblait identique ou vide.
+ * Le slug est repli sur l'ID pour les données anciennes qui n'en auraient pas.
+ */
+export const propertyPath = (p) => `/biens/${encodeURIComponent(p?.slug || p?.recordId || p?.id || '')}`;
+
+/** Link absolu partageable (WhatsApp, TikTok, SMS…). */
+export const propertyShareUrl = (p) =>
+  `${window.location.origin}${propertyPath(p)}`;
 
 export const CARD_FIELDS = [
   'slug',
@@ -86,8 +99,24 @@ export const fetchProperties = async (filters = {}, { limit = PAGE_SIZE, cursor 
 
 export const countProperties = (filters = {}) => base44.entities.Property.count(buildQuery(filters));
 
+/**
+ * Fiche d'un bien à partir de son slug. Un ancien lien peut encore contenir l'ID
+ * numérique (les cartes pointaient vers l'ID) : on retombe alors sur une lecture
+ * directe de l'annonce.
+ */
 export const getPropertyBySlug = async (slug) => {
-  const { items } = await base44.entities.Property.filter({ slug }, { limit: 1 });
+  const key = String(slug || '').trim();
+  if (!key) return null;
+
+  try {
+    // Route dédiée : le backend cherche par slug (et accepte un ancien ID numérique).
+    const record = await apiClient.request(`/api/properties/${encodeURIComponent(key)}`);
+    return record && record.id != null ? toProperty(record) : null;
+  } catch (err) {
+    if (err?.status !== 404) throw err;
+  }
+
+  const { items } = await base44.entities.Property.filter({ slug: key }, { limit: 1 });
   return items.length ? toProperty(items[0]) : null;
 };
 

@@ -1,1 +1,1 @@
-export { base44, absoluteFileUrl, default } from './apiClient';
+export { base44, absoluteFileUrl, apiClient, default } from './apiClient';

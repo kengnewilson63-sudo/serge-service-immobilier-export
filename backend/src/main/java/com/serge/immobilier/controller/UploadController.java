@@ -20,7 +20,7 @@ public class UploadController {
 
     /** Renvoie { "file_url": "/uploads/xxx.jpg" } — même contrat que l'ancien upload client. */
     @PostMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public Map<String, String> upload(@RequestParam("file") MultipartFile file) {
         return Map.of("file_url", fileStorageService.store(file));
     }

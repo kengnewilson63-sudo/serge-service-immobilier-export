@@ -171,7 +171,11 @@ public class DataSeeder implements CommandLineRunner {
             p2.setImages(List.of("https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=1200&auto=format&fit=crop"));
             p2.setPosition(2);
 
-            propertyRepository.saveAll(List.of(p1, p2));
+            PropertyEntity seeded = propertyRepository.saveAll(List.of(p1, p2)).get(0);
+            // Les collections vides ne sont pas écrites au premier insert : on
+            // repeuple les photos de l'annonce déjà enregistrée pour qu'elles existent.
+            seeded.getImages().addAll(p1.getImages());
+            propertyRepository.save(seeded);
         }
     }
 }

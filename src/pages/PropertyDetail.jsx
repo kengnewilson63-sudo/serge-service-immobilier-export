@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import {
+  ArrowLeft,
   Bath,
   BedDouble,
   Building2,
@@ -22,7 +23,8 @@ import Reveal from '@/components/Reveal';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Image } from '@/components/ui/image';
-import { fetchRelated, getPropertyBySlug } from '@/lib/properties';
+import ShareProperty from '@/components/ShareProperty';
+import { fetchRelated, getPropertyBySlug, propertyPath } from '@/lib/properties';
 import { CONTACT, IMAGES, formatPrice, telLink, waLink } from '@/data/site';
 
 const TRANSACTION_LABEL = { location: 'À louer', vente: 'À vendre', evenement: 'Événementiel' };
@@ -32,31 +34,85 @@ const FALLBACK_IMAGE = IMAGES.fallback;
 
 export default function PropertyDetail() {
   const { id } = useParams();
+  const location = useLocation();
   const [property, setProperty] = useState(null);
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [active, setActive] = useState(0);
   const images = property?.images?.length ? property.images : [FALLBACK_IMAGE];
   const activeImage = images[Math.min(active, images.length - 1)];
 
+  // L'adresse du bien est normalisée sur son slug : un lien partagé avec l'ancien
+  // identifiant numérique devient une seule et même URL (copiée, indexée, partagée).
+  const canonicalSlug = property?.slug;
+  useEffect(() => {
+    if (!canonicalSlug) return;
+    const canonical = propertyPath({ slug: canonicalSlug });
+    if (window.location.pathname !== canonical) {
+      window.history.replaceState(window.history.state, '', canonical);
+    }
+  }, [canonicalSlug]);
+
+  // Un lien partagé (WhatsApp, TikTok…) arrive sans historique : « Retour » doit
+  // alors renvoyer au catalogue plutôt que sortir du site.
+  const canGoBack = (() => {
+    if (location.key === 'default') return false;
+    const from = location.state?.from;
+    if (from) return from !== location.pathname && from.startsWith('/biens');
+    return !!document.referrer && document.referrer.startsWith(window.location.origin);
+  })();
+
+  // Page entièrement remise à zéro à chaque changement de bien : sans cela, cliquer
+  // sur un autre bien gardait l'ancien état (photo, chargement) et pouvait faire
+  // croire que tous les liens menaient au même bien.
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+    setActive(0);
+    setProperty(null);
+    setRelated([]);
+    setError('');
+    setLoading(true);
+  }, [id]);
+
   useEffect(() => {
     let alive = true;
-    setLoading(true);
-    setActive(0);
+
     (async () => {
-      const found = await getPropertyBySlug(id);
-      if (!alive) return;
-      setProperty(found);
-      setLoading(false);
-      if (found) {
-        const others = await fetchRelated(found);
-        if (alive) setRelated(others);
+      try {
+        const found = await getPropertyBySlug(id);
+        if (!alive) return;
+        setProperty(found);
+        if (found) {
+          const others = await fetchRelated(found);
+          if (alive) setRelated(others);
+        }
+      } catch (err) {
+        console.error('Chargement du bien impossible:', err);
+        if (alive) setError(err?.message || 'Impossible de charger ce bien pour le moment.');
+      } finally {
+        if (alive) setLoading(false);
       }
     })();
     return () => {
       alive = false;
     };
   }, [id]);
+
+  const backLink = (
+    <Link
+      to="/biens"
+      state={{ from: location.pathname }}
+      onClick={(event) => {
+        if (!canGoBack) return;
+        event.preventDefault();
+        window.history.back();
+      }}
+      className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold text-navy transition-colors hover:border-primary/30 hover:text-primary"
+    >
+      <ArrowLeft className="h-3.5 w-3.5" /> Retour
+    </Link>
+  );
 
   if (loading) {
     return (
@@ -69,8 +125,12 @@ export default function PropertyDetail() {
   if (!property) {
     return (
       <section className="container-x flex flex-col items-center py-32 text-center">
-        <h1 className="font-heading text-2xl font-bold text-navy">Ce bien n'existe pas ou n'est plus disponible</h1>
-        <p className="mt-3 text-sm text-muted-foreground">Il a peut-être été retiré du catalogue.</p>
+        <h1 className="font-heading text-2xl font-bold text-navy">
+          {error ? 'Ce bien ne peut pas être affiché' : "Ce bien n'existe pas ou n'est plus disponible"}
+        </h1>
+        <p className="mt-3 max-w-md text-sm text-muted-foreground">
+          {error || 'Il a peut-être été retiré du catalogue.'}
+        </p>
         <Button asChild className="mt-6 bg-primary text-primary-foreground hover:bg-primary/90">
           <Link to="/biens">Retour au catalogue</Link>
         </Button>
@@ -96,19 +156,21 @@ export default function PropertyDetail() {
         keywords={`${property.type} ${txPhrase} Douala, ${property.type} ${property.neighborhood}, agence immobilière Cité des Palmiers, immobilier ${property.neighborhood}, location ${property.neighborhood} Douala, ${property.type} ${property.city}`}
         image={images[0]}
         type="article"
-        path={`/biens/${property.id}`}
+        path={propertyPath(property)}
         noindex={property.status === 'vendu' || property.status === 'prise'}
         jsonLd={[
           listingJsonLd(property),
           breadcrumbJsonLd([
             { name: 'Accueil', path: '/' },
             { name: 'Biens immobiliers', path: '/biens' },
-            { name: `${property.type} ${txPhrase} à ${property.neighborhood}`, path: `/biens/${property.id}` },
+            { name: `${property.type} ${txPhrase} à ${property.neighborhood}`, path: propertyPath(property) },
           ]),
         ]}
       />
       <section className="border-b border-border bg-secondary/40 py-5">
         <div className="container-x flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+          {backLink}
+          <span className="mx-1 h-3.5 w-px bg-border" />
           <Link to="/" className="transition-colors hover:text-primary">Accueil</Link>
           <ChevronRight className="h-3.5 w-3.5" />
           <Link to="/biens" className="transition-colors hover:text-primary">Biens immobiliers</Link>
@@ -137,6 +199,10 @@ export default function PropertyDetail() {
                 <MapPin className="h-4 w-4" />
                 {property.neighborhood} · {property.city} · {property.region}
               </p>
+
+              <div className="mt-5">
+                <ShareProperty property={property} />
+              </div>
 
               <div className="mt-7 overflow-hidden rounded-2xl border border-border bg-card">
                 <Dialog>
@@ -176,6 +242,12 @@ export default function PropertyDetail() {
                   ))}
                 </div>
               )}
+
+              <p className="mt-3 text-xs text-muted-foreground">
+                {images.length > 1
+                  ? `Photo ${active + 1} sur ${images.length} — cliquez sur une miniature pour l'agrandir.`
+                  : 'Photo du bien.'}
+              </p>
 
               <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
                 {specs.map((s) => (

@@ -1,6 +1,7 @@
 package com.serge.immobilier.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,9 +23,12 @@ public class PropertyEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    // Exposé en JSON sous "id" (et non "entityId") : le frontend s'en sert pour
+    // modifier/supprimer l'annonce, et la valeur manquante cassait l'édition.
+    @JsonProperty("id")
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String slug;
 
     @Column(nullable = false)
@@ -70,6 +74,7 @@ public class PropertyEntity {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "property_images", joinColumns = @JoinColumn(name = "property_id"))
+    @OrderColumn(name = "image_order")
     @Column(name = "image_url")
     private List<String> images = new ArrayList<>();
 

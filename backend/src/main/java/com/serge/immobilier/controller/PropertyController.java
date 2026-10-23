@@ -34,6 +34,8 @@ public class PropertyController {
     @GetMapping("/properties")
     public ResponseEntity<Map<String, Object>> list(
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String slug,
+            @RequestParam(required = false) String exact,
             @RequestParam(required = false) String transaction,
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String region,
@@ -51,7 +53,7 @@ public class PropertyController {
                 ? Sort.by(Sort.Direction.DESC, "id")
                 : Sort.by(Sort.Direction.ASC, "position").and(Sort.by(Sort.Direction.ASC, "id"));
         Pageable pageable = PageRequest.of(offset / limit, limit, order);
-        Specification<PropertyEntity> spec = buildSpecification(keyword, transaction, type, region, city, neighborhood, status, maxPrice, rooms, minArea);
+        Specification<PropertyEntity> spec = buildSpecification(keyword, slug, exact, transaction, type, region, city, neighborhood, status, maxPrice, rooms, minArea);
         Page<PropertyEntity> resultPage = propertyRepository.findAll(spec, pageable);
 
         List<PropertyDto> items = resultPage.getContent().stream().map(PropertyDto::fromEntity).toList();
@@ -95,8 +97,13 @@ public class PropertyController {
         PropertyEntity entity = propertyRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Annonce introuvable : " + id));
         applyPayload(entity, payload);
+        if (entity.getSlug() == null || entity.getSlug().isBlank()) {
+            entity.setSlug(generateSlug(payload.title()));
+        }
         PropertyEntity saved = propertyRepository.save(entity);
-        return ResponseEntity.ok(PropertyDto.fromEntity(saved));
+        // Les photos sont des collections Lazy-modifiables : on recharge l'annonce
+        // pour renvoyer exactement ce qui est en base (ordre des photos inclus).
+        return ResponseEntity.ok(PropertyDto.fromEntity(propertyRepository.findById(saved.getId()).orElse(saved)));
     }
 
     @DeleteMapping("/properties/{id}")
@@ -137,7 +144,19 @@ public class PropertyController {
     }
 
     private void applyPayload(PropertyEntity entity, PropertyDto payload) {
-        entity.setSlug(payload.slug() == null || payload.slug().isBlank() ? entity.getSlug() : payload.slug());
+        // Le slug est l'adresse publique du bien : il ne change pas au fil des
+        // modifications (sauf s'il manquait), donc les liens déjà partagés restent valides.
+        String requestedSlug = payload.slug() == null ? "" : payload.slug().trim();
+        if (!requestedSlug.isBlank() && !requestedSlug.equals(entity.getSlug())) {
+            boolean ownedByAnother = propertyRepository.findBySlug(requestedSlug)
+                    .filter(other -> !other.getId().equals(entity.getId()))
+                    .isPresent();
+            if (ownedByAnother) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "Une autre annonce utilise déjà cette adresse (slug).");
+            }
+            entity.setSlug(requestedSlug);
+        }
         entity.setTitle(payload.title());
         entity.setType(payload.type());
         entity.setTransaction(payload.transaction());
@@ -153,13 +172,17 @@ public class PropertyController {
         entity.setArea(payload.area());
         entity.setContact(payload.contact());
         entity.setDescription(payload.description());
-        entity.setFeatures(payload.features() == null ? new ArrayList<>() : payload.features());
-        entity.setImages(payload.images() == null ? new ArrayList<>() : payload.images());
+        entity.setFeatures(payload.features() == null ? new ArrayList<>() : new ArrayList<>(payload.features()));
+        // Liste neuve : Hibernate compare les collections élément par élément et
+        // n'écrit pas l'ordre dans `image_order` si c'est la même instance.
+        entity.setImages(payload.images() == null ? new ArrayList<>() : new ArrayList<>(payload.images()));
         entity.setPosition(payload.position());
     }
 
     private Specification<PropertyEntity> buildSpecification(
             String keyword,
+            String slug,
+            String exact,
             String transaction,
             String type,
             String region,
@@ -181,6 +204,17 @@ public class PropertyController {
                         cb.like(cb.lower(root.get("city")), pattern),
                         cb.like(cb.lower(root.get("description")), pattern)
                 ));
+            }
+            if (slug != null && !slug.isBlank()) {
+                // `exact=slug` : égalité stricte (vérification d'unicité du slug).
+                // Sinon recherche partielle. Sans ce filtre, l'API renvoyait le
+                // catalogue entier pour `?slug=x` (le frontend filtrait lui-même,
+                // mais la vérification d'unicité tombait alors sur n'importe quoi).
+                if ("slug".equals(exact)) {
+                    predicates.add(cb.equal(root.get("slug"), slug));
+                } else {
+                    predicates.add(cb.like(cb.lower(root.get("slug")), "%" + slug.toLowerCase() + "%"));
+                }
             }
             if (transaction != null && !transaction.isBlank()) predicates.add(cb.equal(root.get("transaction"), transaction));
             if (type != null && !type.isBlank()) predicates.add(cb.equal(root.get("type"), type));

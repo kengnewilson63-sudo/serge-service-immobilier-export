@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Bath, BedDouble, MapPin, Maximize } from 'lucide-react';
 import { Image } from '@/components/ui/image';
 import { IMAGES, formatPrice } from '@/data/site';
+import { propertyPath } from '@/lib/properties';
 
 const TRANSACTION_LABEL = { location: 'À louer', vente: 'À vendre', evenement: 'Événementiel' };
 const STATUS_LABEL = { prise: 'Déjà prise', vendu: 'Vendu' };
@@ -10,7 +11,7 @@ export default function PropertyCard({ property }) {
   const unavailable = property.status !== 'disponible';
   return (
     <Link
-      to={`/biens/${property.id}`}
+      to={propertyPath(property)}
       className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl">
 
       <div className="relative aspect-[4/3] overflow-hidden">

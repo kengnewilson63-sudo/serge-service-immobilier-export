@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ImagePlus, Loader2, Trash2, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ImagePlus, Loader2, Star, Trash2, X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,6 +30,9 @@ const Field = ({ label, hint, children, className = '' }) => (
 const selectClass =
   'h-10 rounded-lg border border-input bg-background px-3 text-sm text-foreground outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/15';
 
+/** Nombre maximum de photos par annonce (la première devient la couverture). */
+export const MAX_IMAGES = 10;
+
 export default function PropertyForm({ record, onSaved, onCancel }) {
   const [form, setForm] = useState(() => ({
     title: record?.title || '',
@@ -52,6 +55,7 @@ export default function PropertyForm({ record, onSaved, onCancel }) {
   }));
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState('');
   const [error, setError] = useState('');
 
   // Options des menus, enrichies avec la valeur actuelle du bien si elle n'est pas
@@ -94,27 +98,74 @@ export default function PropertyForm({ record, onSaved, onCancel }) {
 
   const setImage = (index, value) =>
     setForm((f) => ({ ...f, images: f.images.map((img, i) => (i === index ? value : img)) }));
-  const addImage = () => setForm((f) => ({ ...f, images: [...f.images, ''] }));
+  const addImage = () => {
+    if (form.images.length >= MAX_IMAGES) {
+      setError(`Un bien peut avoir ${MAX_IMAGES} photos au maximum.`);
+      return;
+    }
+    setForm((f) => ({ ...f, images: [...f.images, ''] }));
+  };
   const removeImage = (index) =>
     setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== index) }));
 
-  const uploadImage = async (event) => {
-    const file = event.target.files?.[0];
+  /** Met une photo en première position : c'est la couverture affichée dans le catalogue. */
+  const makeCover = (index) =>
+    setForm((f) => {
+      if (index === 0) return f;
+      const images = [...f.images];
+      const [picked] = images.splice(index, 1);
+      return { ...f, images: [picked, ...images] };
+    });
+
+  const moveImage = (index, delta) =>
+    setForm((f) => {
+      const target = index + delta;
+      if (target < 0 || target >= f.images.length) return f;
+      const images = [...f.images];
+      [images[index], images[target]] = [images[target], images[index]];
+      return { ...f, images };
+    });
+
+  /**
+   * Envoi multiple : on peut sélectionner plusieurs photos d'un coup (jusqu'à la
+   * limite de 10), chacune est envoyée au serveur puis ajoutée dans l'ordre choisi.
+   */
+  const uploadImages = async (event) => {
+    const files = Array.from(event.target.files || []);
     event.target.value = '';
-    if (!file) return;
+    if (!files.length) return;
+
+    const room = MAX_IMAGES - form.images.length;
+    if (room <= 0) {
+      setError(`Un bien peut avoir ${MAX_IMAGES} photos au maximum. Supprimez-en une pour en ajouter.`);
+      return;
+    }
+    const toUpload = files.slice(0, room);
+    const extra = files.length - toUpload.length;
+
     setUploading(true);
     setError('');
-    try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      setForm((f) => ({ ...f, images: [...f.images, file_url] }));
-    } catch (err) {
-      console.error("Upload d'image impossible:", err);
-      setError(
-        err?.data?.message || err?.response?.data?.message || err?.message || "L'image n'a pas pu être envoyée."
-      );
-    } finally {
-      setUploading(false);
+    let done = 0;
+    const failures = [];
+
+    for (const file of toUpload) {
+      setProgress(`Envoi ${done + 1}/${toUpload.length}…`);
+      try {
+        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        setForm((f) => ({ ...f, images: [...f.images, file_url] }));
+        done += 1;
+      } catch (err) {
+        console.error("Upload d'image impossible:", err);
+        failures.push(
+          err?.data?.message || err?.response?.data?.message || err?.message || `${file.name} : envoi impossible.`
+        );
+      }
     }
+
+    setUploading(false);
+    setProgress('');
+    if (failures.length) setError(failures[0]);
+    else if (extra > 0) setError(`${extra} photo(s) ignorée(s) : ${MAX_IMAGES} photos maximum par bien.`);
   };
 
   /**
@@ -126,22 +177,30 @@ export default function PropertyForm({ record, onSaved, onCancel }) {
   const uniqueSlug = async (base, ignoreId) => {
     const root = base || 'bien';
 
-    // Vérifie si le slug de base est libre pour ce bien.
+    // Vérifie si le slug de base est libre pour ce bien. Le filtre du serveur est
+    // une recherche partielle : on compare donc les slugs exactement.
     const isFree = async (candidate) => {
       const { items } = await base44.entities.Property.filter(
         { slug: candidate },
-        { limit: 50, fields: ['id', 'slug'] }
+        { limit: 50 }
       );
-      return !(items ?? []).some((item) => String(item.id) !== String(ignoreId));
+      return !(items ?? []).some(
+        (item) => item.slug === candidate && String(item.id) !== String(ignoreId)
+      );
     };
 
     if (await isFree(root)) return root;
 
-    for (let n = 2; n < 50; n += 1) {
-      const candidate = `${root}-${n}`;
+    // Déjà suffixé (`...-2`) et toujours pris : on repart du suffixe existant.
+    const suffixMatch = root.match(/^(.*)-(\d+)$/);
+    const stem = suffixMatch ? suffixMatch[1] : root;
+    const start = suffixMatch ? Number(suffixMatch[2]) + 1 : 2;
+
+    for (let n = start; n < start + 50; n += 1) {
+      const candidate = `${stem}-${n}`;
       if (await isFree(candidate)) return candidate;
     }
-    return `${root}-${Date.now().toString(36)}`;
+    return `${stem}-${Date.now().toString(36)}`;
   };
 
   const handleSubmit = async (event) => {
@@ -331,37 +390,100 @@ export default function PropertyForm({ record, onSaved, onCancel }) {
       </div>
 
       <div className="mt-6">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Photos</p>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Photos <span className="text-primary">({form.images.length}/{MAX_IMAGES})</span>
+          </p>
+          <p className="text-[11px] text-muted-foreground">La 1re photo est la couverture du bien.</p>
+        </div>
         <div className="mt-3 space-y-3">
           {form.images.map((img, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <div className="h-14 w-20 shrink-0 overflow-hidden rounded-lg border border-border bg-secondary">
+            <div key={i} className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-secondary/30 p-2 sm:flex-nowrap sm:border-0 sm:bg-transparent sm:p-0">
+              <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-lg border border-border bg-secondary">
                 {img ? <Image src={img} alt="" className="h-full w-full" /> : null}
+                {i === 0 && (
+                  <span className="absolute left-1 top-1 rounded bg-navy/85 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
+                    Couverture
+                  </span>
+                )}
               </div>
-              <Input value={img} onChange={(e) => setImage(i, e.target.value)} placeholder="Adresse de la photo" />
-              <button
-                type="button"
-                onClick={() => removeImage(i)}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                aria-label="Retirer la photo"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
+              <Input
+                value={img}
+                onChange={(e) => setImage(i, e.target.value)}
+                placeholder="Adresse de la photo"
+                className="min-w-0 flex-1"
+              />
+              <div className="flex shrink-0 items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => moveImage(i, -1)}
+                  disabled={i === 0}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-navy disabled:opacity-30"
+                  aria-label="Déplacer la photo vers la gauche"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => moveImage(i, 1)}
+                  disabled={i === form.images.length - 1}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-navy disabled:opacity-30"
+                  aria-label="Déplacer la photo vers la droite"
+                >
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => makeCover(i)}
+                  disabled={i === 0}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:opacity-30"
+                  aria-label="Mettre en couverture"
+                  title="Mettre en couverture"
+                >
+                  <Star className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => removeImage(i)}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                  aria-label="Retirer la photo"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
             </div>
           ))}
         </div>
 
         <div className="mt-3 flex flex-wrap gap-3">
-          <Button type="button" variant="outline" onClick={addImage} className="border-primary/25 text-primary hover:bg-primary/5">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={addImage}
+            disabled={form.images.length >= MAX_IMAGES}
+            className="border-primary/25 text-primary hover:bg-primary/5"
+          >
             <ImagePlus className="mr-2 h-4 w-4" /> Ajouter un lien photo
           </Button>
-          <label className="inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md border border-primary/25 px-4 text-sm font-medium text-primary transition-colors hover:bg-primary/5">
+          <label
+            className={`inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md border border-primary/25 px-4 text-sm font-medium text-primary transition-colors hover:bg-primary/5 ${
+              uploading || form.images.length >= MAX_IMAGES ? 'pointer-events-none opacity-50' : ''
+            }`}
+          >
             {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
-            {uploading ? 'Envoi…' : 'Envoyer une photo'}
-            <input type="file" accept="image/*" className="hidden" onChange={uploadImage} disabled={uploading} />
+            {uploading ? progress || 'Envoi…' : 'Envoyer des photos'}
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={uploadImages}
+              disabled={uploading || form.images.length >= MAX_IMAGES}
+            />
           </label>
         </div>
         <p className="mt-2 text-[11px] text-muted-foreground">
+          Vous pouvez sélectionner plusieurs photos d'un coup (JPEG, PNG, WEBP ou GIF, 10 Mo max par photo).
           Les photos envoyées sont stockées publiquement — toute personne disposant du lien peut les ouvrir.
         </p>
       </div>

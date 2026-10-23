@@ -119,6 +119,10 @@ const normalizePropertyFilter = (query = {}) => {
       }
       if (value.slug) {
         params.set('slug', String(value.slug));
+        // Le serveur compare les slugs partiellement : `exact` évite qu'un bien
+        // "villa-logpom" réponde pour "villa-logpom-2" (ce qui renommait l'annonce
+        // à chaque sauvegarde avec un nouveau suffixe).
+        params.set('exact', key);
         return;
       }
       return;
@@ -137,6 +141,7 @@ const normalizePropertyFilter = (query = {}) => {
  * sont souvent rejetés par le serveur.
  */
 const PROPERTY_WRITE_FIELDS = [
+  'id',
   'slug',
   'title',
   'type',
@@ -163,7 +168,11 @@ const toWritePayload = (payload = {}) => {
   PROPERTY_WRITE_FIELDS.forEach((key) => {
     if (payload[key] !== undefined) out[key] = payload[key];
   });
-  if (Array.isArray(out.images)) out.images = out.images.map(storedFileRef);
+  if (Array.isArray(out.images)) {
+    out.images = out.images.map(storedFileRef).filter((url) => typeof url === 'string' && url.trim());
+    // Un bien peut recevoir jusqu'à 10 photos (galerie type annonce).
+    out.images = out.images.slice(0, 10);
+  }
   return out;
 };
 

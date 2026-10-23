@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, Loader2, Lock, LogIn, LogOut, Pencil, Plus, ShieldAlert, Trash2 } from 'lucide-react';
+import { Copy, ExternalLink, Loader2, Lock, LogIn, LogOut, Pencil, Plus, ShieldAlert, Trash2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { isAdminUser } from '@/lib/user-role';
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import PropertyForm from '@/components/admin/PropertyForm';
 import SeoTools from '@/components/admin/SeoTools';
 import UsersPanel from '@/components/admin/UsersPanel';
+import { propertyShareUrl } from '@/lib/properties';
 import { formatPrice } from '@/data/site';
 
 const STATUS_LABEL = { disponible: 'Disponible', prise: 'Déjà prise', vendu: 'Vendu' };
@@ -20,6 +21,7 @@ export default function Admin() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [busyId, setBusyId] = useState(null);
+  const [copiedId, setCopiedId] = useState(null);
 
   const isAdmin = isAdminUser(user);
 
@@ -100,6 +102,19 @@ export default function Admin() {
     load();
   };
 
+  /** Copie le lien public du bien, prêt à envoyer au client sur WhatsApp / TikTok. */
+  const handleCopyLink = async (record) => {
+    const url = propertyShareUrl(record);
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      window.prompt('Copiez le lien du bien :', url);
+      return;
+    }
+    setCopiedId(record.id);
+    window.setTimeout(() => setCopiedId(null), 2500);
+  };
+
   return (
     <section className="bg-secondary/40 py-10 sm:py-14">
       <SeoTools records={allRecords} />
@@ -173,8 +188,18 @@ export default function Admin() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleCopyLink(record)}
+                      className={copiedId === record.id ? 'text-primary' : 'text-muted-foreground hover:text-primary'}
+                      title="Copier le lien à envoyer au client"
+                    >
+                      <Copy className="h-4 w-4" />
+                      <span className="ml-1.5 text-xs">{copiedId === record.id ? 'Copié' : 'Lien'}</span>
+                    </Button>
                     <Button asChild variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
-                      <Link to={`/biens/${record.slug}`} target="_blank" rel="noopener noreferrer">
+                      <Link to={`/biens/${record.slug || record.id}`} target="_blank" rel="noopener noreferrer">
                         <ExternalLink className="h-4 w-4" />
                       </Link>
                     </Button>
